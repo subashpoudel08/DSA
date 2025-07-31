@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sliding Window - Max Sum</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+    }
+
+    header {
+      background-color: #3949ab;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      min-height: 80vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #eeeeee;
+      padding: 20px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #3949ab;
+      font-weight: bold;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #3949ab;
+      margin-bottom: 10px;
+    }
+
+    code {
+      background-color: #e8e8e8;
+      display: block;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+    }
+
+    .quiz {
+      background: #ffffff;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .quiz label {
+      display: block;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+
+    .quiz.correct {
+      border-left: 5px solid #66bb6a;
+    }
+
+    .quiz.incorrect {
+      border-left: 5px solid #ef5350;
+    }
+
+    button {
+      background-color: #3949ab;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .summary {
+      background-color: #dcedc8;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+
+    footer {
+      background-color: #3949ab;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    .result {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🧠 Sliding Window - Max Sum of Window K</h1>
+  </header>
+
+  <div class="container">
+    <div class="sidebar">
+      <ul>
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="#">📚 Topics</a></li>
+        <li><a href="#">📈 Progress</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <h2>💡 What is Sliding Window?</h2>
+      <p>Sliding Window ek efficient technique hai jo mostly arrays aur strings ke problems me use hoti hai. Jab bhi kisi **fixed size subarray** ka sum, max, min ya count nikalna ho — toh hum har bar naya window banane ki jagah purane window ka use karke naya result calculate karte hain.</p>
+
+      <h2>🚀 Problem: Max Sum of Window Size K</h2>
+      <p>Given an array and an integer k, find the maximum sum of any subarray of size k.</p>
+
+      <h3>🔢 C++ Code</h3>
+      <code>
+int maxSum(vector&lt;int&gt; arr, int k) {
+  int max_sum = 0, window_sum = 0;
+  for (int i = 0; i &lt; k; i++) 
+    window_sum += arr[i];
+  max_sum = window_sum;
+
+  for (int i = k; i &lt; arr.size(); i++) {
+    window_sum += arr[i] - arr[i - k];
+    max_sum = max(max_sum, window_sum);
+  }
+  return max_sum;
+}
+      </code>
+
+      <h2>🧪 Quiz Time!</h2>
+
+      <form id="quizForm">
+        <div class="quiz" id="q1">
+          <p><strong>Q1.</strong> Sliding Window reduces time complexity from?</p>
+          <label><input type="radio" name="q1" value="a"> O(n²) to O(n)</label>
+          <label><input type="radio" name="q1" value="b"> O(n) to O(log n)</label>
+          <label><input type="radio" name="q1" value="c"> O(n³) to O(n²)</label>
+        </div>
+
+        <div class="quiz" id="q2">
+          <p><strong>Q2.</strong> What’s the core idea of sliding window?</p>
+          <label><input type="radio" name="q2" value="a"> Brute force all subarrays</label>
+          <label><input type="radio" name="q2" value="b"> Use previous result to compute next</label>
+          <label><input type="radio" name="q2" value="c"> Sort the array</label>
+        </div>
+
+        <div class="quiz" id="q3">
+          <p><strong>Q3.</strong> What is the window size in the problem?</p>
+          <label><input type="radio" name="q3" value="a"> n</label>
+          <label><input type="radio" name="q3" value="b"> k</label>
+          <label><input type="radio" name="q3" value="c"> 1</label>
+        </div>
+
+        <div class="quiz" id="q4">
+          <p><strong>Q4.</strong> Which part of the window is removed while sliding?</p>
+          <label><input type="radio" name="q4" value="a"> End element</label>
+          <label><input type="radio" name="q4" value="b"> Middle element</label>
+          <label><input type="radio" name="q4" value="c"> First element</label>
+        </div>
+
+        <div class="quiz" id="q5">
+          <p><strong>Q5.</strong> When do we use sliding window?</p>
+          <label><input type="radio" name="q5" value="a"> When the window is constant or dynamic</label>
+          <label><input type="radio" name="q5" value="b"> Only for sorting</label>
+          <label><input type="radio" name="q5" value="c"> Always for binary trees</label>
+        </div>
+
+        <div class="quiz" id="q6">
+          <p><strong>Q6.</strong> Which operation is done in each slide?</p>
+          <label><input type="radio" name="q6" value="a"> Add both ends</label>
+          <label><input type="radio" name="q6" value="b"> Add new, remove old</label>
+          <label><input type="radio" name="q6" value="c"> Subtract middle</label>
+        </div>
+
+        <button type="button" onclick="checkAnswers()">Submit Quiz</button>
+        <div class="result" id="resultBox"></div>
+      </form>
+
+      <div class="summary">
+        <h2>📋 Summary</h2>
+        <ul>
+          <li>✔ Sliding Window avoids recomputing entire subarrays.</li>
+          <li>✔ Efficient for fixed size subarray problems.</li>
+          <li>✔ Use: Add new element, remove oldest in window.</li>
+          <li>✔ Time Complexity becomes O(n) for most problems.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Subash's DSA Playground 🚀
+  </footer>
+
+  <script>
+    const correctAnswers = {
+      q1: "a",
+      q2: "b",
+      q3: "b",
+      q4: "c",
+      q5: "a",
+      q6: "b"
+    };
+
+    function checkAnswers() {
+      let score = 0;
+
+      for (let q in correctAnswers) {
+        const selected = document.querySelector(`input[name="${q}"]:checked`);
+        const quizDiv = document.getElementById(q);
+        quizDiv.classList.remove("correct", "incorrect");
+
+        if (selected) {
+          if (selected.value === correctAnswers[q]) {
+            quizDiv.classList.add("correct");
+            score++;
+          } else {
+            quizDiv.classList.add("incorrect");
+          }
+        }
+      }
+
+      const resultBox = document.getElementById("resultBox");
+      resultBox.textContent = `🎯 Subash Bhai! You scored ${score}/6`;
+    }
+  </script>
+
+</body>
+</html>
