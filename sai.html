@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorting Algorithms - Insertion & Selection</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #3949ab;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      min-height: 80vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #eeeeee;
+      padding: 20px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #3949ab;
+      font-weight: bold;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #3949ab;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #bbb;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #c5cae9;
+    }
+
+    code {
+      background-color: #e8e8e8;
+      display: block;
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      white-space: pre-wrap;
+    }
+
+    footer {
+      background-color: #3949ab;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>⚙️ Sorting Algorithms: Insertion & Selection Sort</h1>
+  </header>
+
+  <div class="container">
+    <div class="sidebar">
+      <ul>
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="#">📑 Notes</a></li>
+        <li><a href="#">📈 Progress</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+
+      <h2>📌 Insertion Sort</h2>
+      <p>Ek-ek element uthao aur use sorted list me sahi jagah insert karo. Jaise cards sort karte hai haath me 🃏</p>
+      
+      <code>
+void insertionSort(vector&lt;int&gt;& arr) {
+  for (int i = 1; i &lt; arr.size(); i++) {
+    int key = arr[i];
+    int j = i - 1;
+    while (j &gt;= 0 &amp;&amp; arr[j] &gt; key) {
+      arr[j + 1] = arr[j];
+      j--;
+    }
+    arr[j + 1] = key;
+  }
+}
+      </code>
+
+      <h2>📌 Selection Sort</h2>
+      <p>Minimum element dhundo aur current position pe daal do. Ek-ek pass me ek element apni sahi jagah pe chala jata hai ✅</p>
+
+      <code>
+void selectionSort(vector&lt;int&gt;& arr) {
+  for (int i = 0; i &lt; arr.size() - 1; i++) {
+    int minIndex = i;
+    for (int j = i + 1; j &lt; arr.size(); j++) {
+      if (arr[j] &lt; arr[minIndex])
+        minIndex = j;
+    }
+    swap(arr[i], arr[minIndex]);
+  }
+}
+      </code>
+
+
+     
+
+<h2>🧪 Quiz Time! - Test Your Sorting Skills</h2>
+
+<form id="quizForm">
+  <div class="quiz" id="q1">
+    <p><strong>Q1.</strong> Insertion sort is best suited for?</p>
+    <label><input type="radio" name="q1" value="a"> Large datasets</label>
+    <label><input type="radio" name="q1" value="b"> Random unordered data</label>
+    <label><input type="radio" name="q1" value="c"> Nearly sorted data</label>
+  </div>
+
+  <div class="quiz" id="q2">
+    <p><strong>Q2.</strong> Selection sort performs how many swaps in total?</p>
+    <label><input type="radio" name="q2" value="a"> O(n²)</label>
+    <label><input type="radio" name="q2" value="b"> O(n)</label>
+    <label><input type="radio" name="q2" value="c"> Depends on array</label>
+  </div>
+
+  <div class="quiz" id="q3">
+    <p><strong>Q3.</strong> Which one is stable?</p>
+    <label><input type="radio" name="q3" value="a"> Selection Sort</label>
+    <label><input type="radio" name="q3" value="b"> Insertion Sort</label>
+    <label><input type="radio" name="q3" value="c"> Both</label>
+  </div>
+
+  <div class="quiz" id="q4">
+    <p><strong>Q4.</strong> What is the average case time complexity of Insertion Sort?</p>
+    <label><input type="radio" name="q4" value="a"> O(n)</label>
+    <label><input type="radio" name="q4" value="b"> O(n²)</label>
+    <label><input type="radio" name="q4" value="c"> O(log n)</label>
+  </div>
+
+  <div class="quiz" id="q5">
+    <p><strong>Q5.</strong> Selection sort is based on?</p>
+    <label><input type="radio" name="q5" value="a"> Inserting in right place</label>
+    <label><input type="radio" name="q5" value="b"> Finding min and swapping</label>
+    <label><input type="radio" name="q5" value="c"> Dividing and conquering</label>
+  </div>
+
+  <button type="button" onclick="checkAnswers()">Submit Quiz</button>
+  <div class="result" id="resultBox"></div>
+</form>
+
+<script>
+  const correctAnswers = {
+    q1: "c",
+    q2: "b",
+    q3: "b",
+    q4: "b",
+    q5: "b"
+  };
+
+  function checkAnswers() {
+    let score = 0;
+
+    for (let q in correctAnswers) {
+      const selected = document.querySelector(`input[name="${q}"]:checked`);
+      const quizDiv = document.getElementById(q);
+      quizDiv.classList.remove("correct", "incorrect");
+
+      if (selected) {
+        if (selected.value === correctAnswers[q]) {
+          quizDiv.classList.add("correct");
+          score++;
+        } else {
+          quizDiv.classList.add("incorrect");
+        }
+      }
+    }
+
+    const resultBox = document.getElementById("resultBox");
+    resultBox.textContent = `🧠 Subash Bhai, You scored ${score}/5! Keep it up!`;
+  }
+</script>
+
+<style>
+  .quiz {
+    background: #ffffff;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .quiz label {
+    display: block;
+    margin: 5px 0;
+    cursor: pointer;
+  }
+
+  .quiz.correct {
+    border-left: 5px solid #66bb6a;
+  }
+
+  .quiz.incorrect {
+    border-left: 5px solid #ef5350;
+  }
+
+  .result {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #3949ab;
+  }
+
+  button {
+    background-color: #3949ab;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+</style>
+
+
+      <h2>📊 Complexity Comparison</h2>
+      <table>
+        <tr>
+          <th>Algorithm</th>
+          <th>Best Case</th>
+          <th>Average Case</th>
+          <th>Worst Case</th>
+          <th>Space</th>
+          <th>Stable?</th>
+        </tr>
+        <tr>
+          <td>Insertion Sort</td>
+          <td>O(n)</td>
+          <td>O(n²)</td>
+          <td>O(n²)</td>
+          <td>O(1)</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td>Selection Sort</td>
+          <td>O(n²)</td>
+          <td>O(n²)</td>
+          <td>O(n²)</td>
+          <td>O(1)</td>
+          <td>❌</td>
+        </tr>
+      </table>
+
+      <h2>🧠 Use Cases</h2>
+      <ul>
+        <li>✔ Insertion Sort: Jab array already sorted ho ya chhoti size ka ho (like 20-30 elements)</li>
+        <li>✔ Selection Sort: Jab swaps kam matter karein, aur stable hona zaroori na ho</li>
+      </ul>
+
+      <h2>📚 Summary</h2>
+      <ul>
+        <li>Insertion Sort: Best for almost sorted arrays</li>
+        <li>Selection Sort: Simple to understand but inefficient for large arrays</li>
+        <li>Dono in-place sorting algorithms hai (O(1) space)</li>
+        <li>Insertion Sort = Stable, Selection Sort = Not Stable</li>
+      </ul>
+
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Subash's DSA Playground 🚀
+  </footer>
+
+</body>
+</html>
