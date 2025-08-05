@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git & GitHub Study Guide</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background-color: #24292e;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #0366d6;
+    }
+    code {
+      background-color: #eee;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+    .quiz {
+      margin-top: 2rem;
+    }
+    .quiz h3 {
+      margin-bottom: 0.5rem;
+    }
+    .quiz button {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .quiz button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>🚀 Git & GitHub Study Guide</h1>
+    <p>Bhai Subash ke liye ekdum beginner-friendly guide!</p>
+  </header>
+
+  <div class="container">
+    <h2>📌 What is Git?</h2>
+    <p>Git ek version control system hai jo developers ko apne code ke versions track karne deta hai. Jaise time machine for your code!</p>
+
+    <h2>📌 What is GitHub?</h2>
+    <p>GitHub ek online platform hai jaha tu apna git repository upload kar sakta hai. Team ke sath collaboration bhi aasaan hota hai.</p>
+
+    <h2>⚙️ Common Git Commands</h2>
+    <ul>
+      <li><code>git init</code>: New repo create karta hai</li>
+      <li><code>git add .</code>: Saare files stage karta hai</li>
+      <li><code>git commit -m "message"</code>: Changes ko save karta hai</li>
+      <li><code>git remote add origin &lt;url&gt;</code>: GitHub repo se connect</li>
+      <li><code>git push -u origin master</code>: Files push karta hai GitHub pe</li>
+    </ul>
+
+    <h2>📁 .gitignore</h2>
+    <p>Yeh file specify karti hai ki kaunse files Git me track nahi hone chahiye.</p>
+    <pre><code>.env
+node_modules/
+build/
+*.log</code></pre>
+
+    <h2>🔐 .env File</h2>
+    <p>Isme sensitive info jaise API keys hoti hain. Yeh kabhi bhi GitHub pe push nahi karna chahiye.</p>
+
+    <h2>🌿 main vs master</h2>
+    <p>
+      <strong>master</strong> pehle default branch hoti thi, ab <strong>main</strong> default hai modern repos me.
+    </p>
+
+    <h2>🌍 CMD Se GitHub Pe Push Ka Flow</h2>
+    <ol>
+      <li><code>git init</code></li>
+      <li><code>git add .</code></li>
+      <li><code>git commit -m "Initial commit"</code></li>
+      <li><code>git remote add origin https://github.com/user/repo.git</code></li>
+      <li><code>git push -u origin main</code> (ya <code>master</code>)</li>
+    </ol>
+
+    <h2>🚫 Already pushed file ko hide kaise kare (without delete)</h2>
+    <ol>
+      <li>File ko <code>.gitignore</code> me add karo</li>
+      <li>Phir Git se untrack karo:
+        <pre><code>git rm --cached file_name</code></pre>
+      </li>
+      <li>Phir commit aur push:
+        <pre><code>git commit -m "removed from tracking"
+git push</code></pre>
+      </li>
+    </ol>
+
+    <div class="quiz">
+      <h2>🧠 Quiz Time!</h2>
+      <h3>1. Which command is used to stage all changes?</h3>
+      <input type="radio" name="q1" value="a"> git stage .<br>
+      <input type="radio" name="q1" value="b"> git add .<br>
+      <input type="radio" name="q1" value="c"> git commit<br>
+
+      <h3>2. What is the purpose of .gitignore?</h3>
+      <input type="radio" name="q2" value="a"> To hide your repo<br>
+      <input type="radio" name="q2" value="b"> To ignore specific files from tracking<br>
+      <input type="radio" name="q2" value="c"> To commit everything<br>
+
+      <button onclick="checkAnswers()">Submit Answers</button>
+      <p id="result"></p>
+    </div>
+  </div>
+
+  <script>
+    function checkAnswers() {
+      const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+      const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+
+      let score = 0;
+      if (q1 === 'b') score++;
+      if (q2 === 'b') score++;
+
+      document.getElementById('result').innerText = `🎉 You scored ${score}/2`;
+    }
+  </script>
+
+</body>
+
+</html>
