@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sum of Subarray Ranges — Structured Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;           /* slate-900 */
+      --panel: #111827;        /* gray-900 */
+      --card: #0b1220;         /* deep slate */
+      --muted: #94a3b8;        /* slate-400 */
+      --text: #e5e7eb;         /* gray-200 */
+      --accent: #22d3ee;       /* cyan-400 */
+      --accent-2: #a78bfa;     /* violet-400 */
+      --ok: #34d399;           /* emerald-400 */
+      --warn: #fbbf24;         /* amber-400 */
+      --danger: #fb7185;       /* rose-400 */
+      --code-bg: #0b1020;
+      --border: #1f2937;       /* gray-800 */
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+    }
+
+    /* Layout */
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      overflow-y: overlay;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px 40px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: sticky;
+      top: 20px;
+      align-self: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+    }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: all .15s ease;
+      border: 1px solid transparent;
+    }
+    .toc a:hover { background: #0b1220; border-color: var(--border); color: #ffffff; }
+    .toc a small { color: var(--muted); font-size: 12px; }
+
+    /* Main content */
+    .main {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .hero {
+      position: relative;
+      background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .hero:after {
+      content: "";
+      position: absolute;
+      top: -40px; right: -60px;
+      width: 220px; height: 220px;
+      background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%);
+      filter: blur(6px);
+      pointer-events: none;
+    }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+
+    section.card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .note { color: var(--muted); font-size: 14px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--border); color: var(--muted); }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px;
+      background: #0b1220; border: 1px solid var(--border); color: var(--text); font-size: 13px;
+    }
+    .pill b { color: var(--accent); font-weight: 600; }
+
+    /* Details */
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary {
+      list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe;
+      border-bottom: 1px solid var(--border); user-select: none;
+    }
+    summary::-webkit-details-marker { display:none; }
+    details[open] summary { border-bottom-color: rgba(255,255,255,0.06); }
+    .details-body { padding: 12px 14px; color: var(--text); }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; color: #c7d2fe; font-weight: 600; background: rgba(167,139,250,0.08); }
+    tr:last-child td { border-bottom: none; }
+    .k { color: #93c5fd; }
+    .v { color: #fca5a5; }
+
+    /* Code */
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+
+    .formula { background: #0b1220; border: 1px dashed #1f334d; padding: 10px 12px; border-radius: 10px; }
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02));
+      padding: 10px 12px; border-radius: 10px; margin: 10px 0;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+
+    @media (max-width: 960px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#brute">Brute Force</a></li>
+        <li><a href="#brute-complexity">Brute Force: Complexity</a></li>
+        <li><a href="#strategy">Optimization Strategy</a></li>
+        <li><a href="#max-contrib">Contribution as Maximum</a></li>
+        <li><a href="#min-contrib">Contribution as Minimum</a></li>
+        <li><a href="#stacks">Monotonic Stacks</a></li>
+        <li><a href="#outline">Algorithm Outline</a></li>
+        <li><a href="#code">Conceptual Code</a></li>
+        <li><a href="#opt-complexity">Optimized: Complexity</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">Sum of Subarray Ranges</h1>
+        <p class="subtitle">Compute the sum over all subarrays of (max − min). From brute force to O(N) using monotonic stacks.</p>
+        <div class="chips" style="margin-top: 10px;">
+          <span class="chip">Arrays</span>
+          <span class="chip">Subarrays</span>
+          <span class="chip">Monotonic Stack</span>
+          <span class="chip">Contribution Technique</span>
+          <span class="chip">O(N)</span>
+        </div>
+      </header>
+
+      <section id="intro" class="card">
+        <h2>Introduction</h2>
+        <p><span class="pill"><b>Goal</b> Sum of ranges of all subarrays</span></p>
+        <p>
+          The <b>range</b> of a subarray is <code>max(subarray) − min(subarray)</code>. Given an array, add up the ranges of all its subarrays.
+        </p>
+        <div class="formula">
+          <b>Example</b>: <code>arr = [1, 4, 3, 2]</code>
+          <div class="note">We will compare a brute force approach with an optimized O(N) solution.</div>
+        </div>
+      </section>
+
+      <section id="brute" class="card">
+        <h2>Brute Force Approach</h2>
+        <div class="grid-2">
+          <div>
+            <h3>Idea</h3>
+            <ul>
+              <li>Generate all subarrays <code>arr[i..j]</code>.</li>
+              <li>For each, compute <code>max</code> and <code>min</code>.</li>
+              <li>Add <code>max − min</code> to the total.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Why it's slow</h3>
+            <ul>
+              <li><b>N^2</b> subarrays.</li>
+              <li><b>O(N)</b> to find <code>max/min</code> per subarray.</li>
+              <li>Total: <b>O(N^3)</b>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <details open>
+          <summary>Worked Example (arr = [1, 4, 3, 2])</summary>
+          <div class="details-body">
+            <table>
+              <thead>
+                <tr><th>Subarray</th><th>Max</th><th>Min</th><th>Range</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>[1]</td><td>1</td><td>1</td><td>0</td></tr>
+                <tr><td>[1, 4]</td><td>4</td><td>1</td><td>3</td></tr>
+                <tr><td>[1, 4, 3]</td><td>4</td><td>1</td><td>3</td></tr>
+                <tr><td>[1, 4, 3, 2]</td><td>4</td><td>1</td><td>3</td></tr>
+                <tr><td>[4]</td><td>4</td><td>4</td><td>0</td></tr>
+                <tr><td>[4, 3]</td><td>4</td><td>3</td><td>1</td></tr>
+                <tr><td>[4, 3, 2]</td><td>4</td><td>2</td><td>2</td></tr>
+                <tr><td>[3]</td><td>3</td><td>3</td><td>0</td></tr>
+                <tr><td>[3, 2]</td><td>3</td><td>2</td><td>1</td></tr>
+                <tr><td>[2]</td><td>2</td><td>2</td><td>0</td></tr>
+              </tbody>
+            </table>
+            <p class="callout"><b>Total</b>: 0 + 3 + 3 + 3 + 0 + 1 + 2 + 0 + 1 + 0 = <b>13</b></p>
+          </div>
+        </details>
+      </section>
+
+      <section id="brute-complexity" class="card">
+        <h2>Brute Force: Complexity</h2>
+        <ul>
+          <li><b>Time</b>: O(N^3)</li>
+          <li><b>Space</b>: O(1)</li>
+        </ul>
+      </section>
+
+      <section id="strategy" class="card">
+        <h2>Optimization Strategy: Element Contributions</h2>
+        <p>
+          Instead of enumerating subarrays, compute how many subarrays each <code>arr[i]</code> is the <b>maximum</b> of and how many it is the <b>minimum</b> of.
+        </p>
+        <div class="grid-2">
+          <div class="formula">
+            <b>As maximum</b>: contributes <code>+ arr[i] × countMax(i)</code>
+          </div>
+          <div class="formula">
+            <b>As minimum</b>: contributes <code>− arr[i] × countMin(i)</code>
+          </div>
+        </div>
+        <p class="note">So total = Σ<sub>i</sub> <code>arr[i] × (countMax(i) − countMin(i))</code>.</p>
+      </section>
+
+      <section id="max-contrib" class="card">
+        <h2>Counting When arr[i] is the Maximum</h2>
+        <p>Find boundaries where values become <b>strictly smaller</b> than <code>arr[i]</code>:</p>
+        <ul>
+          <li><b>PSE[i]</b>: index of Previous Smaller Element to the left (or −1 if none)</li>
+          <li><b>NSE[i]</b>: index of Next Smaller Element to the right (or n if none)</li>
+        </ul>
+        <div class="formula"><code>countMax(i) = (i − PSE[i]) × (NSE[i] − i)</code></div>
+        <div class="callout"><b>Contribution</b>: <code>+ arr[i] × (i − PSE[i]) × (NSE[i] − i)</code></div>
+      </section>
+
+      <section id="min-contrib" class="card">
+        <h2>Counting When arr[i] is the Minimum</h2>
+        <p>Find boundaries where values become <b>strictly greater</b> than <code>arr[i]</code>:</p>
+        <ul>
+          <li><b>PGE[i]</b>: index of Previous Greater Element to the left (or −1 if none)</li>
+          <li><b>NGE[i]</b>: index of Next Greater Element to the right (or n if none)</li>
+        </ul>
+        <div class="formula"><code>countMin(i) = (i − PGE[i]) × (NGE[i] − i)</code></div>
+        <div class="callout"><b>Contribution</b>: <code>− arr[i] × (i − PGE[i]) × (NGE[i] − i)</code></div>
+      </section>
+
+      <section id="stacks" class="card">
+        <h2>Efficient Boundaries via Monotonic Stacks</h2>
+        <p>All four boundary arrays can be computed in O(N) using stacks that maintain monotonic order:</p>
+        <div class="grid-2">
+          <div>
+            <h3>Smaller boundaries</h3>
+            <ul>
+              <li><b>PSE</b>, <b>NSE</b>: use a <b>monotonically increasing</b> stack</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Greater boundaries</h3>
+            <ul>
+              <li><b>PGE</b>, <b>NGE</b>: use a <b>monotonically decreasing</b> stack</li>
+            </ul>
+          </div>
+        </div>
+        <p class="note">Compute all PSE/NSE/PGE/NGE in O(N). Then one more O(N) pass to sum contributions.</p>
+      </section>
+
+      <section id="outline" class="card">
+        <h2>Algorithm Outline</h2>
+        <ol>
+          <li>Compute <code>pse</code> with a monotonic increasing stack (left → right).</li>
+          <li>Compute <code>nse</code> with a monotonic increasing stack (right → left).</li>
+          <li>Compute <code>pge</code> with a monotonic decreasing stack (left → right).</li>
+          <li>Compute <code>nge</code> with a monotonic decreasing stack (right → left).</li>
+          <li>For each <code>i</code>, add <code>arr[i] × (i − pse[i]) × (nse[i] − i)</code> and subtract <code>arr[i] × (i − pge[i]) × (nge[i] − i)</code>.</li>
+          <li>Return the total (apply modulo only if the problem statement requires it).</li>
+        </ol>
+      </section>
+
+      <section id="code" class="card">
+        <h2>Conceptual Code (C++-style)</h2>
+        <pre><code>long long sumSubarrayRanges(const vector&lt;int&gt;&amp; arr) {
+  int n = (int)arr.size();
+  vector&lt;int&gt; pse(n), nse(n), pge(n), nge(n);
+
+  // Compute PSE: Previous Smaller (strict)
+  {
+    vector&lt;int&gt; st;
+    for (int i = 0; i &lt; n; ++i) {
+      while (!st.empty() &amp;&amp; arr[st.back()] &gt;= arr[i]) st.pop_back();
+      pse[i] = st.empty() ? -1 : st.back();
+      st.push_back(i);
+    }
+  }
+
+  // Compute NSE: Next Smaller (strict)
+  {
+    vector&lt;int&gt; st;
+    for (int i = n - 1; i &gt;= 0; --i) {
+      while (!st.empty() &amp;&amp; arr[st.back()] &gt; arr[i]) st.pop_back();
+      nse[i] = st.empty() ? n : st.back();
+      st.push_back(i);
+    }
+  }
+
+  // Compute PGE: Previous Greater (strict)
+  {
+    vector&lt;int&gt; st;
+    for (int i = 0; i &lt; n; ++i) {
+      while (!st.empty() &amp;&amp; arr[st.back()] &lt;= arr[i]) st.pop_back();
+      pge[i] = st.empty() ? -1 : st.back();
+      st.push_back(i);
+    }
+  }
+
+  // Compute NGE: Next Greater (strict)
+  {
+    vector&lt;int&gt; st;
+    for (int i = n - 1; i &gt;= 0; --i) {
+      while (!st.empty() &amp;&amp; arr[st.back()] &lt; arr[i]) st.pop_back();
+      nge[i] = st.empty() ? n : st.back();
+      st.push_back(i);
+    }
+  }
+
+  long long total = 0; // use modulo only if specified by the problem
+  for (int i = 0; i &lt; n; ++i) {
+    long long leftMax  = i - pse[i];
+    long long rightMax = nse[i] - i;
+    long long leftMin  = i - pge[i];
+    long long rightMin = nge[i] - i;
+    total += 1LL * arr[i] * leftMax * rightMax;  // as max
+    total -= 1LL * arr[i] * leftMin * rightMin;  // as min
+  }
+  return total;
+}
+</code></pre>
+        <p class="note">Tie-handling (strict vs non-strict comparisons) is chosen to avoid double counting. Adjust operators consistently if your problem definition differs.</p>
+      </section>
+
+      <section id="opt-complexity" class="card">
+        <h2>Optimized Solution: Complexity</h2>
+        <ul>
+          <li><b>Time</b>: O(N) to compute boundaries + O(N) to sum = <b>O(N)</b></li>
+          <li><b>Space</b>: O(N) for boundary arrays and stacks</li>
+        </ul>
+      </section>
+
+      <section id="conclusion" class="card">
+        <h2>Conclusion</h2>
+        <ul>
+          <li><b>Key idea</b>: Convert subarray enumeration to per-element contribution counts.</li>
+          <li><b>Tool</b>: Monotonic stacks to find nearest smaller/greater boundaries fast.</li>
+          <li><b>Result</b>: Clean O(N) time, O(N) space solution.</li>
+        </ul>
+      </section>
+
+      <div class="footer-note">Made for quick revision and deep understanding — happy learning! ✨</div>
+    </main>
+  </div>
+</body>
+</html>
+
+
