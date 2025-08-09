@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sum of Subarray Minimums — Explained</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#6ee7b7; --muted:#9aa4b2; --glass:rgba(255,255,255,0.03);
+      --maxw:900px; --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:linear-gradient(180deg,#071028 0%, #091025 60%); color:#e6eef6; display:flex; align-items:center; justify-content:center; padding:32px;}
+    .wrap{width:100%; max-width:var(--maxw)}
+    header{display:flex; gap:16px; align-items:center; margin-bottom:18px}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#111827,#1f2937);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(2,6,23,.6)}
+    .logo strong{font-size:20px;color:var(--accent)}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:20px; border-radius:var(--radius); box-shadow:0 8px 30px rgba(2,6,23,.6);}
+    .meta{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+    .label{background:var(--glass);padding:6px 10px;border-radius:10px;color:var(--muted);font-size:13px}
+
+    section{margin-top:14px}
+    .summary{background:rgba(255,255,255,0.02); padding:14px;border-radius:10px; line-height:1.5; color:#d7e6f0}
+
+    table{width:100%; border-collapse:collapse; margin-top:12px}
+    th, td{padding:10px 8px; text-align:left; font-size:14px}
+    th{color:var(--accent); font-weight:600; border-bottom:1px solid rgba(255,255,255,0.04)}
+    tr+tr td{border-top:1px solid rgba(255,255,255,0.02)}
+
+    pre{background:#071427;padding:14px;border-radius:10px;overflow:auto;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;font-size:13px}
+
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent);padding:8px 12px;border-radius:10px;cursor:pointer}
+    button.secondary{color:var(--muted);border-color:rgba(255,255,255,0.03)}
+
+    .sticky-help{margin-top:16px;color:var(--muted);font-size:13px}
+
+    /* small */
+    @media (max-width:600px){:root{--maxw:100%} header{flex-direction:row} .logo{width:56px;height:56px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo"><strong>SUM</strong></div>
+      <div>
+        <h1>Sum of Subarray Minimums — Readable Notes</h1>
+        <p class="lead">Compact, timestamped notes and an interactive view of the explanation from the video — <link>https://youtu.be/v0e8p9JCgRc?list=PLgUwDviBIf0pOd5zvVVSzgpo6BaCpHT9c</link></p>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="meta">
+        <div class="label">Problem</div>
+        <div class="label">Array Example: [3, 1, 2, 4]</div>
+        <div class="label">Complexity: O(N) optimal</div>
+      </div>
+
+      <section>
+        <h3 style="margin:0 0 8px 0">Summary (short)</h3>
+        <div class="summary" id="summary">
+          This video explains how to compute the sum of minimums of all contiguous subarrays. Brute-force enumerates each subarray and finds its minimum (O(N^2)), while the optimal approach counts how many subarrays each element is the minimum of using monotonic stacks (Next Smaller & Previous Smaller-or-Equal), producing an O(N) solution. Proper handling of duplicates requires asymmetric equality comparisons to avoid double-counting.
+        </div>
+      </section>
+
+      <section>
+        <h3 style="margin:14px 0 8px 0">Details (timestamped)</h3>
+        <table>
+          <thead>
+            <tr><th style="width:135px">Timestamp</th><th>Key Concept</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>00:15 — 02:22</td><td><strong>Problem definition</strong>: List all subarrays, compute each minimum and sum them (example result for [3,1,2,4] = 17).</td></tr>
+            <tr><td>02:22 — 05:03</td><td><strong>Brute-force</strong>: Nested loops to enumerate subarrays and find minima, O(N^2) time; fine for small N but too slow for large inputs.</td></tr>
+            <tr><td>05:03 — 06:50</td><td><strong>Contribution idea</strong>: For each element, compute how many subarrays have it as the minimum; final sum = Σ value * contribution_count.</td></tr>
+            <tr><td>06:50 — 11:35</td><td><strong>Boundaries via monotonic stacks</strong>: Use Previous Smaller-or-Equal (left) and Next Smaller (right) coordinates; contribution = (i - left) * (right - i).</td></tr>
+            <tr><td>11:35 — 18:35</td><td><strong>Duplicates/edge cases</strong>: Use asymmetric comparisons (e.g., PSE with &le; on left and strict < on right) so every subarray is counted once.</td></tr>
+            <tr><td>18:35 — 23:14</td><td><strong>Implementation</strong>: Compute left/right arrays with stacks, then accumulate contributions with modulo arithmetic if required.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h3 style="margin:14px 0 8px 0">Reference code (conceptual, commented)</h3>
+        <pre id="code">// PSE/PSEE (Previous Smaller or Equal) and NSE (Next Smaller) idea (pseudo-C++ style)
+
+vector<int> left(n), right(n);
+stack<int> st;
+// compute left: index of previous smaller-or-equal element
+for (int i = 0; i &lt; n; ++i) {
+  while (!st.empty() && arr[st.top()] &gt; arr[i]) st.pop();
+  left[i] = st.empty() ? -1 : st.top();
+  st.push(i);
+}
+
+// clear and compute right: index of next smaller element
+while (!st.empty()) st.pop();
+for (int i = n-1; i &gt;= 0; --i) {
+  while (!st.empty() && arr[st.top()] &gt;= arr[i]) st.pop();
+  right[i] = st.empty() ? n : st.top();
+  st.push(i);
+}
+
+// contribution and sum
+long long ans = 0;
+for (int i = 0; i &lt; n; ++i) {
+  long long leftCount = i - left[i];
+  long long rightCount = right[i] - i;
+  ans += (long long)arr[i] * leftCount * rightCount; // apply mod if needed
+}
+</pre>
+
+      </section>
+
+      <div class="controls">
+        <button id="copyAll">Copy Full HTML Notes</button>
+        <button class="secondary" id="download">Download as HTML</button>
+        <button class="secondary" id="copyCode">Copy Concept Code</button>
+      </div>
+
+      <div class="sticky-help">Tip: Open this file in your browser, edit the text, or push to GitHub. The code block is ready to paste into your C++ solution (convert pseudocode to your style).</div>
+
+    </div>
+
+    </div>
+
+ 
+</body>
+</html>
