@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SDE Networking Interview Q&A — Comprehensive Guide</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22d3ee;
+      --accent-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; line-height: 1.6; overflow-y: overlay;
+    }
+    .container { display: grid; grid-template-columns: 300px 1fr; gap: 24px; max-width: 1280px; margin: 20px auto; padding: 0 16px 40px; }
+    .sidebar { position: sticky; top: 20px; align-self: start; background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 16px; max-height: calc(100vh - 40px); overflow: auto; }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a { display: block; text-decoration: none; color: var(--text); padding: 8px 10px; border-radius: 10px; border: 1px solid transparent; transition: all .15s ease; }
+    .toc a:hover { background: #0b1220; border-color: var(--border); }
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .hero { position: relative; background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06)); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .hero:after { content: ""; position: absolute; top: -40px; right: -60px; width: 220px; height: 220px; background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%); filter: blur(6px); pointer-events: none; }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+    section.card { background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 18px; box-shadow: var(--shadow); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    .note { color: var(--muted); font-size: 14px; }
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe; border-bottom: 1px solid var(--border); user-select: none; }
+    summary::-webkit-details-marker { display:none; }
+    .details-body { padding: 12px 14px; color: var(--text); }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+    .callout { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02)); padding: 10px 12px; border-radius: 10px; margin: 10px 0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--border); color: var(--muted); }
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+    @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } .grid-3 { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#foundations">Foundations & Key Terms</a></li>
+        <li><a href="#osi">OSI vs TCP/IP</a></li>
+        <li><a href="#tcp">TCP Deep Dive</a></li>
+        <li><a href="#udp">UDP & Realtime</a></li>
+        <li><a href="#sockets">Sockets & Ports</a></li>
+        <li><a href="#nat">NAT, Firewalls, Proxies</a></li>
+        <li><a href="#dns">DNS Essentials</a></li>
+        <li><a href="#http">HTTP/1.1 → HTTP/2 → HTTP/3</a></li>
+        <li><a href="#tls">TLS/HTTPS</a></li>
+        <li><a href="#cdn">Caching & CDNs</a></li>
+        <li><a href="#apis">REST, gRPC, WebSockets</a></li>
+        <li><a href="#web-sec">CORS, Cookies, CSRF</a></li>
+        <li><a href="#perf">Performance & Reliability</a></li>
+        <li><a href="#tools">Tools & Commands</a></li>
+        <li><a href="#debug">Debug Scenarios</a></li>
+        <li><a href="#cloud">Cloud & Kubernetes Networking</a></li>
+        <li><a href="#lb">Load Balancing & Gateways</a></li>
+        <li><a href="#pitfalls">Common Pitfalls</a></li>
+        <li><a href="#quiz">Quick Quiz</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">SDE Networking Interview Q&A</h1>
+        <p class="subtitle">Concise answers to the most-asked questions. Ready for whiteboards, system design, and on-call debugging.</p>
+        <div class="chips">
+          <span class="chip">OSI</span>
+          <span class="chip">TCP/IP</span>
+          <span class="chip">DNS</span>
+          <span class="chip">HTTP</span>
+          <span class="chip">TLS</span>
+          <span class="chip">CDN</span>
+          <span class="chip">Kubernetes</span>
+          <span class="chip">Load Balancing</span>
+          <span class="chip">Debugging</span>
+        </div>
+      </header>
+
+      <section id="foundations" class="card">
+        <h2>Foundations & Key Terms</h2>
+        <details open>
+          <summary>What is latency vs throughput vs bandwidth?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Latency</b>: One-way/round-trip time delay (e.g., RTT).</li>
+              <li><b>Bandwidth</b>: Max capacity of the link (e.g., 100 Mbps).</li>
+              <li><b>Throughput</b>: Actual achieved data rate, depends on congestion, loss, protocol.</li>
+            </ul>
+            <div class="callout">Bandwidth-delay product ≈ bandwidth × RTT → how much data can be “in flight”.</div>
+          </div>
+        </details>
+        <details>
+          <summary>What is a packet, frame, segment, and datagram?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Frame</b> (L2): Ethernet frame (MAC addresses).</li>
+              <li><b>Packet</b> (L3): IP packet (IP addresses).</li>
+              <li><b>Segment</b> (TCP) / <b>Datagram</b> (UDP) (L4): transport-layer units.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>What is MTU and MSS?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>MTU</b>: Max Transmission Unit at L2 (e.g., 1500 bytes on Ethernet).</li>
+              <li><b>MSS</b>: Max TCP segment payload (≈ MTU − IP − TCP headers).</li>
+              <li>Path MTU discovery avoids IP fragmentation.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="osi" class="card">
+        <h2>OSI vs TCP/IP</h2>
+        <details open>
+          <summary>Map OSI layers to the TCP/IP model</summary>
+          <div class="details-body grid-2">
+            <div>
+              <ul>
+                <li><b>OSI 7→1</b>: App, Presentation, Session, Transport, Network, Data Link, Physical</li>
+                <li><b>TCP/IP 4</b>: Application, Transport, Internet, Link</li>
+              </ul>
+            </div>
+            <div>
+              <ul>
+                <li>HTTP/DNS → Application</li>
+                <li>TCP/UDP → Transport</li>
+                <li>IP/ICMP → Internet</li>
+                <li>Ethernet/Wi‑Fi → Link</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details>
+          <summary>Where do TLS/SSL and HTTP/2 fit?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>TLS</b>: between Application and Transport (often seen as part of Application stack).</li>
+              <li><b>HTTP/2/3</b>: Application layer protocols (HTTP/3 runs over QUIC/UDP).</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="tcp" class="card">
+        <h2>TCP Deep Dive</h2>
+        <details open>
+          <summary>How does TCP 3‑way handshake work?</summary>
+          <div class="details-body">
+            <ol>
+              <li>Client → SYN</li>
+              <li>Server → SYN‑ACK</li>
+              <li>Client → ACK (connection established)</li>
+            </ol>
+            <p class="note">4‑way close: FIN/ACK on each direction; TIME_WAIT on active closer.</p>
+          </div>
+        </details>
+        <details>
+          <summary>What are flow control and congestion control?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Flow control</b> (receiver-driven): TCP window (rwnd) prevents overrunning receiver.</li>
+              <li><b>Congestion control</b> (network-driven): cwnd adapts to loss/RTT (slow start, AIMD, fast retransmit/recovery; Reno, CUBIC, BBR).</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Why TIME_WAIT and CLOSE_WAIT?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>TIME_WAIT</b>: on active close, ensures late segments die; avoids old duplicates colliding.</li>
+              <li><b>CLOSE_WAIT</b>: peer closed; local app hasn’t closed socket yet.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>What is Nagle’s algorithm and delayed ACKs?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Nagle</b>: coalesce small sends to reduce tinygrams (can hurt latency).</li>
+              <li><b>Delayed ACK</b>: receiver delays ACK briefly to piggyback.</li>
+              <li>Interaction can cause latency spikes; disable Nagle (<code>TCP_NODELAY</code>) for low-latency RPC.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>How do retransmissions and fast retransmit work?</summary>
+          <div class="details-body">
+            <ul>
+              <li>RTO based on RTT variance; on timeout → retransmit.</li>
+              <li>3 duplicate ACKs → fast retransmit without waiting for timeout.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="udp" class="card">
+        <h2>UDP & Realtime</h2>
+        <details open>
+          <summary>TCP vs UDP</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>TCP</b>: reliable, ordered, congestion and flow control, connection-oriented.</li>
+              <li><b>UDP</b>: best-effort, unordered, no built-in reliability, lower overhead → realtime, QUIC, DNS.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>When to choose UDP?</summary>
+          <div class="details-body">
+            <ul>
+              <li>Realtime media (VoIP, gaming), low-latency RPC over QUIC/HTTP‑3, custom reliability.</li>
+              <li>Small request/response like classic DNS.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="sockets" class="card">
+        <h2>Sockets & Ports</h2>
+        <details open>
+          <summary>What is a socket and a 4‑tuple?</summary>
+          <div class="details-body">
+            <ul>
+              <li>Socket: endpoint for communication.</li>
+              <li>TCP connection identified by <b>(srcIP, srcPort, dstIP, dstPort)</b>.</li>
+              <li>Ephemeral ports chosen by OS for outbound connections.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Keep‑alive vs idle timeout</summary>
+          <div class="details-body">
+            <ul>
+              <li>TCP keep‑alive: probes to detect dead peers.</li>
+              <li>Load balancers/proxies may close idle connections; tune timeouts accordingly.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="nat" class="card">
+        <h2>NAT, Firewalls, Proxies</h2>
+        <details open>
+          <summary>How does NAT work? What is PAT?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>NAT</b>: translates private ↔ public addresses.</li>
+              <li><b>PAT</b>: many-to-one using port translation (home routers).</li>
+              <li>Breaks end-to-end; affects inbound connectivity and P2P (needs STUN/TURN/ICE).</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>L4 vs L7 load balancer vs reverse proxy</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>L4</b> (TCP/UDP): fast, no HTTP awareness.</li>
+              <li><b>L7</b> (HTTP): routes by path/header/cookie; can terminate TLS.</li>
+              <li><b>Reverse proxy</b>: sits in front of services; caching, auth, compression, WAF.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Forward proxy vs reverse proxy</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Forward</b>: client-side egress (e.g., corporate proxy).</li>
+              <li><b>Reverse</b>: server-side ingress (e.g., NGINX/Envoy).</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="dns" class="card">
+        <h2>DNS Essentials</h2>
+        <details open>
+          <summary>How does DNS resolution work?</summary>
+          <div class="details-body">
+            <ol>
+              <li>Client → resolver (recursive).</li>
+              <li>Resolver queries root → TLD → authoritative nameserver.</li>
+              <li>Returns records (A/AAAA/CNAME) with TTL; caches along the path.</li>
+            </ol>
+          </div>
+        </details>
+        <details>
+          <summary>Common DNS record types</summary>
+          <div class="details-body grid-3">
+            <ul>
+              <li><b>A</b>: IPv4</li>
+              <li><b>AAAA</b>: IPv6</li>
+              <li><b>CNAME</b>: alias</li>
+            </ul>
+            <ul>
+              <li><b>NS</b>: authoritative servers</li>
+              <li><b>MX</b>: mail</li>
+              <li><b>TXT</b>: metadata (SPF, verification)</li>
+            </ul>
+            <ul>
+              <li><b>SRV</b>: service discovery</li>
+              <li><b>CAA</b>: allowed CAs</li>
+              <li><b>PTR</b>: reverse lookup</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>What is Anycast DNS?</summary>
+          <div class="details-body">Same IP advertised from many locations; BGP routes client to nearest healthy POP.</div>
+        </details>
+      </section>
+
+      <section id="http" class="card">
+        <h2>HTTP/1.1 → HTTP/2 → HTTP/3</h2>
+        <details open>
+          <summary>Key differences</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>HTTP/1.1</b>: text, head-of-line blocking at app layer; keep-alive, pipelining rarely used.</li>
+              <li><b>HTTP/2</b>: binary framing, multiplexing, HPACK, single TCP connection per origin.</li>
+              <li><b>HTTP/3</b>: over QUIC/UDP; streams avoid TCP HOL; 0‑RTT possible.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>When does multiplexing still suffer?</summary>
+          <div class="details-body">HTTP/2 still shares one TCP—packet loss stalls all streams (TCP HOL). HTTP/3 avoids this via QUIC streams.</div>
+        </details>
+        <details>
+          <summary>What are idempotency and safe methods?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Safe</b>: GET, HEAD—no state change.</li>
+              <li><b>Idempotent</b>: GET, PUT, DELETE—same result on repeats; design retries accordingly.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="tls" class="card">
+        <h2>TLS/HTTPS</h2>
+        <details open>
+          <summary>What happens in a TLS handshake?</summary>
+          <div class="details-body">
+            <ul>
+              <li>ClientHello (ciphers, SNI, ALPN) → ServerHello (chosen params).</li>
+              <li>Certificate validation (chain, hostname, trust store).</li>
+              <li>Key exchange (ECDHE) → derive symmetric keys → encrypted traffic.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>What is HSTS, OCSP stapling, and certificate pinning?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>HSTS</b>: forces HTTPS.</li>
+              <li><b>OCSP stapling</b>: server provides revocation proof.</li>
+              <li><b>Pinning</b>: bind to specific cert/key (careful: rotation risk).</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="cdn" class="card">
+        <h2>Caching & CDNs</h2>
+        <details open>
+          <summary>How do HTTP caches work?</summary>
+          <div class="details-body">
+            <ul>
+              <li>Freshness via <code>Cache-Control: max-age, s-maxage, stale-while-revalidate</code>.</li>
+              <li>Validation via <code>ETag</code> and <code>Last-Modified</code>.</li>
+              <li>Private vs shared caches; Vary headers control cache keys.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>How do CDNs route users?</summary>
+          <div class="details-body">Anycast DNS + geo routing; cache hierarchy (edge → regional → origin); purge/invalidate on deploy.</div>
+        </details>
+      </section>
+
+      <section id="apis" class="card">
+        <h2>REST, gRPC, WebSockets</h2>
+        <details open>
+          <summary>REST vs gRPC</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>REST</b>: JSON over HTTP; human-friendly; flexible.</li>
+              <li><b>gRPC</b>: Protobuf over HTTP/2; strongly-typed; streaming; faster on the wire.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>WebSockets vs SSE</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>WebSockets</b>: full-duplex; useful for chat, multiplayer.</li>
+              <li><b>SSE</b>: server → client unidirectional; simpler; auto-reconnect.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="web-sec" class="card">
+        <h2>CORS, Cookies, CSRF</h2>
+        <details open>
+          <summary>Explain CORS in simple terms</summary>
+          <div class="details-body">Browser security policy restricting cross-origin requests. Server opts-in via <code>Access-Control-Allow-*</code> headers; preflight with OPTIONS for non-simple requests.</div>
+        </details>
+        <details>
+          <summary>Cookie flags and session security</summary>
+          <div class="details-body">
+            <ul>
+              <li><code>HttpOnly</code>, <code>Secure</code>, <code>SameSite</code> (Lax/Strict/None).</li>
+              <li>Use CSRF tokens for state-changing requests when using cookies.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="perf" class="card">
+        <h2>Performance & Reliability</h2>
+        <details open>
+          <summary>How does loss affect TCP throughput?</summary>
+          <div class="details-body">Loss triggers cwnd reduction; throughput ~ inversely related to sqrt(loss). High RTT and loss → poor goodput.</div>
+        </details>
+        <details>
+          <summary>Retries, backoff, and idempotency</summary>
+          <div class="details-body">
+            <ul>
+              <li>Exponential backoff + jitter to avoid thundering herds.</li>
+              <li>Retry only idempotent operations or use idempotency keys.</li>
+              <li>Set deadlines/timeouts; avoid retry storms across layers.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>gRPC/HTTP client best practices</summary>
+          <div class="details-body">
+            <ul>
+              <li>Connection pooling, keep-alives, circuit breakers, timeouts, budgets.</li>
+              <li>Observe with metrics (latency, p99), logs, and traces.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="tools" class="card">
+        <h2>Tools & Commands</h2>
+        <div class="grid-3">
+          <div>
+            <h3>CLI</h3>
+            <pre><code>ping example.com
+tracert example.com   # Windows
+traceroute example.com # Linux/macOS
+nslookup example.com
+dig +short A example.com
+curl -v https://example.com
+curl -I https://example.com
+netstat -ano | findstr :443
+Get-Process -Id &lt;PID&gt;
+            </code></pre>
+          </div>
+          <div>
+            <h3>Packet capture</h3>
+            <pre><code># Linux
+sudo tcpdump -i any port 443 -w tls.pcap
+# Windows
+Wireshark GUI: filter tcp.port==443 or ip.addr==&lt;host&gt;
+            </code></pre>
+          </div>
+          <div>
+            <h3>HTTP debugging</h3>
+            <pre><code>curl -v --http2 https://example.com
+curl -v --http3 https://example.com
+curl -H "Cache-Control: no-cache" https://example.com
+            </code></pre>
+          </div>
+        </div>
+        <p class="note">On Windows, use PowerShell equivalents (e.g., Test-NetConnection, Resolve-DnsName).</p>
+      </section>
+
+      <section id="debug" class="card">
+        <h2>Debug Scenarios</h2>
+        <details open>
+          <summary>Intermittent timeouts between service A → B</summary>
+          <div class="details-body">
+            <ul>
+              <li>Check DNS TTL flapping, load balancer health, backend overload.</li>
+              <li>Look for SYN backlog drops, connection limits, NAT exhaustion.</li>
+              <li>Validate TLS handshake timing, cert validity, SNI/ALPN mismatch.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>High p99 latency after deploy</summary>
+          <div class="details-body">
+            <ul>
+              <li>Nagle + delayed ACKs; disable Nagle for small RPCs.</li>
+              <li>Queueing at LB, thread pool saturation, GC pauses.</li>
+              <li>Head-of-line blocking on HTTP/2 under loss → try HTTP/3.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Clients behind corporate proxy cannot connect</summary>
+          <div class="details-body">
+            <ul>
+              <li>Require HTTP CONNECT for TLS; test with <code>curl --proxy</code>.</li>
+              <li>Check SNI requirements, TLS versions/ciphers, certificate pinning.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="cloud" class="card">
+        <h2>Cloud & Kubernetes Networking</h2>
+        <details open>
+          <summary>VPC basics: subnets, route tables, SG/NACL</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Subnets</b>: IP ranges; public vs private.</li>
+              <li><b>Route tables</b>: next hops (IGW, NAT GW).</li>
+              <li><b>Security Groups</b>: stateful firewall; <b>NACL</b>: stateless ACL.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Kubernetes Services & Ingress</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>ClusterIP</b>: internal virtual IP.</li>
+              <li><b>NodePort</b>: exposes on node ports.</li>
+              <li><b>LoadBalancer</b>: cloud LB per Service.</li>
+              <li><b>Ingress</b>: L7 routing (paths/hosts) to Services via controller.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Service discovery and DNS in k8s</summary>
+          <div class="details-body">CoreDNS resolves <code>svc.namespace.svc.cluster.local</code>; clients use Envoy/gRPC naming or native DNS.</div>
+        </details>
+      </section>
+
+      <section id="lb" class="card">
+        <h2>Load Balancing & Gateways</h2>
+        <details open>
+          <summary>Client-side vs server-side load balancing</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Client-side</b>: client picks instance (e.g., service mesh, library with EDS/Consul).</li>
+              <li><b>Server-side</b>: send to LB (NLB/ALB/NGINX/Envoy) which picks backend.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Common algorithms</summary>
+          <div class="details-body">
+            <ul>
+              <li>Round-robin, least connections, power-of-two-choices, weighted, consistent hashing.</li>
+              <li>Health checks, outlier detection, slow-start.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>API Gateway vs Service Mesh</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>API Gateway</b>: north-south traffic, auth, rate limit, transformation.</li>
+              <li><b>Service Mesh</b>: east-west traffic, mTLS, retries, telemetry, traffic shaping.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="pitfalls" class="card">
+        <h2>Common Pitfalls (Interview Traps)</h2>
+        <ul>
+          <li>Assuming TCP is always ordered and low-latency—retransmissions and Nagle can add delay.</li>
+          <li>Ignoring DNS caching/TTL during rollouts; forgetting negative caching.</li>
+          <li>Retrying non-idempotent POSTs without idempotency keys.</li>
+          <li>Setting infinite timeouts; not using deadlines or circuit breakers.</li>
+          <li>Overusing HTTP/2 without considering packet loss; not testing HTTP/3.</li>
+          <li>Assuming private IPs are unreachable; NAT hairpin and SG rules can allow access.</li>
+        </ul>
+      </section>
+
+      <section id="quiz" class="card">
+        <h2>Quick Quiz (Self‑check)</h2>
+        <details>
+          <summary>Why might HTTP/2 perform worse than HTTP/1.1 under some conditions?</summary>
+          <div class="details-body">Single TCP connection suffers from TCP HOL under loss; multiple H1.1 connections can sometimes fare better.</div>
+        </details>
+        <details>
+          <summary>How to mitigate SYN flood?</summary>
+          <div class="details-body">SYN cookies, larger SYN backlog, rate limiting, proxies/load balancers.</div>
+        </details>
+        <details>
+          <summary>What breaks when moving a service behind a reverse proxy?</summary>
+          <div class="details-body">Client IP unless using <code>X-Forwarded-For</code>/PROXY protocol; absolute redirects; CORS; sticky sessions.</div>
+        </details>
+        <details>
+          <summary>Difference between 301, 302, 307, 308?</summary>
+          <div class="details-body">301/308 permanent; 302/307 temporary. 307/308 preserve method/body; 301/302 historically may change to GET.</div>
+        </details>
+        <details>
+          <summary>gRPC call failing only via corporate network?</summary>
+          <div class="details-body">Proxy blocks HTTP/2 or CONNECT; ALPN mismatch; TLS inspection interfering; try plaintext over HTTP/1.1 tunnel or enable H2 over CONNECT.</div>
+        </details>
+      </section>
+
+      <div class="footer-note">Bookmark this for interviews and on-call — fast recall, high signal. 🚀</div>
+    </main>
+  </div>
+</body>
+</html>
+
+
