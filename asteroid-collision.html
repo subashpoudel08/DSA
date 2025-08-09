@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Asteroid Collision (LeetCode 735) — Structured Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22d3ee;
+      --accent-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      overflow-y: overlay;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px 40px;
+    }
+    .sidebar {
+      position: sticky; top: 20px; align-self: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+    }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a { display: block; text-decoration: none; color: var(--text); padding: 8px 10px; border-radius: 10px; transition: all .15s ease; border: 1px solid transparent; }
+    .toc a:hover { background: #0b1220; border-color: var(--border); color: #ffffff; }
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .hero { position: relative; background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06)); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .hero:after { content: ""; position: absolute; top: -40px; right: -60px; width: 220px; height: 220px; background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%); filter: blur(6px); pointer-events: none; }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+    section.card { background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 18px; box-shadow: var(--shadow); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .note { color: var(--muted); font-size: 14px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: #0b1220; border: 1px solid var(--border); color: var(--text); font-size: 13px; }
+    .pill b { color: var(--accent); }
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe; border-bottom: 1px solid var(--border); user-select: none; }
+    summary::-webkit-details-marker { display:none; }
+    .details-body { padding: 12px 14px; color: var(--text); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; color: #c7d2fe; font-weight: 600; background: rgba(167,139,250,0.08); }
+    tr:last-child td { border-bottom: none; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+    .callout { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02)); padding: 10px 12px; border-radius: 10px; margin: 10px 0; }
+    .formula { background: #0b1220; border: 1px dashed #1f334d; padding: 10px 12px; border-radius: 10px; }
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+    @media (max-width: 960px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#problem">Problem Description</a></li>
+        <li><a href="#rules">Collision Rules</a></li>
+        <li><a href="#scenarios">Collision Scenarios</a></li>
+        <li><a href="#walkthroughs">Example Walkthroughs</a></li>
+        <li><a href="#algorithm">Stack Algorithm</a></li>
+        <li><a href="#pseudocode">Pseudocode</a></li>
+        <li><a href="#complexity">Time & Space Complexity</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">Asteroid Collision (LeetCode 735)</h1>
+        <p class="subtitle">Simulate collisions using a stack to determine the final state of asteroids.</p>
+        <div class="chips">
+          <span class="chip">Stack</span>
+          <span class="chip">Simulation</span>
+          <span class="chip">Arrays</span>
+          <span class="chip">O(N)</span>
+        </div>
+      </header>
+
+      <section id="intro" class="card">
+        <h2>Introduction</h2>
+        <p>Topic: <b>Asteroid Collision</b></p>
+        <p><span class="pill"><b>Goal</b> Return the final state after all collisions</span></p>
+        <p>Example input: <code>asteroids = [5, 10, -5]</code></p>
+      </section>
+
+      <section id="problem" class="card">
+        <h2>Problem Description</h2>
+        <ul>
+          <li>Each integer represents an asteroid's <b>size</b> (absolute value) and <b>direction</b> (sign).</li>
+          <li><b>Positive</b> → moving right; <b>Negative</b> → moving left.</li>
+          <li>Only asteroids moving toward each other can collide (right-moving meets left-moving).</li>
+          <li>When two collide: smaller explodes; if equal, both explode.</li>
+          <li>Asteroids moving in the same direction never meet.</li>
+        </ul>
+        <div class="callout">Return the remaining asteroids (in order) after all collisions are resolved.</div>
+      </section>
+
+      <section id="rules" class="card">
+        <h2>Collision Rules</h2>
+        <p>Collision can only happen when a right-moving asteroid is before a left-moving asteroid:</p>
+        <div class="formula"><code>top &gt; 0</code> and <code>a &lt; 0</code> ⇒ they are heading towards each other.</div>
+        <table>
+          <thead>
+            <tr><th>Condition</th><th>Outcome</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>|top| &gt; |a|</code></td><td>Current <code>a</code> explodes, <code>top</code> survives</td></tr>
+            <tr><td><code>|top| &lt; |a|</code></td><td><code>top</code> explodes; continue comparing <code>a</code> with new top</td></tr>
+            <tr><td><code>|top| == |a|</code></td><td>Both explode (pop top; do not push <code>a</code>)</td></tr>
+          </tbody>
+        </table>
+        <p class="note">If stack is empty or top is negative, a negative asteroid just moves left without meeting anyone.</p>
+      </section>
+
+      <section id="scenarios" class="card">
+        <h2>Collision Scenarios</h2>
+        <ul>
+          <li><b>Same direction</b>: <code>[5, 7, 10]</code>, <code>[-5, -7, -10]</code> → no collisions.</li>
+          <li><b>Opposite directions but no meeting</b>: distances or ordering prevent a collision.</li>
+          <li><b>Opposite directions and meet</b>: compare sizes to decide explosions.</li>
+        </ul>
+      </section>
+
+      <section id="walkthroughs" class="card">
+        <h2>Example Walkthroughs</h2>
+
+        <details open>
+          <summary>[5, 10, -5]</summary>
+          <div class="details-body">
+            <ul>
+              <li>Stack: [] → push 5 → [5] → push 10 → [5, 10]</li>
+              <li>See -5: top 10 vs -5 → |10| &gt; |−5| ⇒ -5 explodes</li>
+              <li>Result: <b>[5, 10]</b></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>[8, -8]</summary>
+          <div class="details-body">
+            <ul>
+              <li>Stack: [] → push 8 → [8]</li>
+              <li>See -8: top 8 vs -8 → |8| == |−8| ⇒ both explode</li>
+              <li>Result: <b>[]</b></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>[10, 2, -5]</summary>
+          <div class="details-body">
+            <ul>
+              <li>Stack: [] → [10] → [10, 2]</li>
+              <li>See -5: compare 2 vs -5 → |2| &lt; |−5| ⇒ pop 2 → [10]</li>
+              <li>Now 10 vs -5 → |10| &gt; |−5| ⇒ -5 explodes</li>
+              <li>Result: <b>[10]</b></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>[-2, -1, 1, 2]</summary>
+          <div class="details-body">
+            <ul>
+              <li>Negatives move left; positives move right; ordering prevents meetings</li>
+              <li>Result: <b>[-2, -1, 1, 2]</b></li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="algorithm" class="card">
+        <h2>Algorithm (Stack)</h2>
+        <ol>
+          <li>Initialize empty stack.</li>
+          <li>For each asteroid <code>a</code>:
+            <ul>
+              <li>If <code>a &gt; 0</code> or stack empty or top <code>&lt; 0</code> → push <code>a</code>.</li>
+              <li>Else (<code>a &lt; 0</code> and top <code>&gt; 0</code>):
+                <ul>
+                  <li>While stack not empty and top <code>&gt; 0</code> and <code>top &lt; |a|</code>: pop top (top explodes).</li>
+                  <li>After loop:
+                    <ul>
+                      <li>If stack empty or top <code>&lt; 0</code>: push <code>a</code> (no more collisions possible).</li>
+                      <li>Else if <code>top == |a|</code>: pop top (both explode); do not push <code>a</code>.</li>
+                      <li>Else (<code>top &gt; |a|</code>): current <code>a</code> explodes; do nothing.</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>Return the stack.</li>
+        </ol>
+        <p class="note">Each asteroid is pushed and popped at most once → linear time.</p>
+      </section>
+
+      <section id="pseudocode" class="card">
+        <h2>Pseudocode (Python-like)</h2>
+        <pre><code>def asteroidCollision(asteroids):
+    stack = []
+    for a in asteroids:
+        if a &gt; 0 or not stack or stack[-1] &lt; 0:
+            stack.append(a)
+        else:  # a &lt; 0 and stack[-1] &gt; 0
+            while stack and stack[-1] &gt; 0 and stack[-1] &lt; abs(a):
+                stack.pop()
+            if not stack or stack[-1] &lt; 0:
+                stack.append(a)
+            elif stack[-1] == abs(a):
+                stack.pop()  # both explode
+            # else: |top| &gt; |a|, a explodes (do nothing)
+    return stack
+</code></pre>
+      </section>
+
+      <section id="complexity" class="card">
+        <h2>Time & Space Complexity</h2>
+        <ul>
+          <li><b>Time</b>: O(N) — each asteroid is pushed/popped at most once.</li>
+          <li><b>Space</b>: O(N) — worst-case all asteroids remain on stack.</li>
+        </ul>
+      </section>
+
+      <section id="conclusion" class="card">
+        <h2>Conclusion</h2>
+        <ul>
+          <li><b>Core idea</b>: Use a stack to simulate head-on collisions.</li>
+          <li><b>Rule</b>: Collide only when right-moving meets left-moving.</li>
+          <li><b>Outcome</b>: Clean, linear-time simulation with clear cases.</li>
+        </ul>
+      </section>
+
+      <div class="footer-note">Made for quick revision and deep understanding — happy learning! 🚀</div>
+    </main>
+  </div>
+</body>
+</html>
+
+
