@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Networking Interview Q&A — Comprehensive Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22d3ee;
+      --accent-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      overflow-y: overlay;
+    }
+    .container { display: grid; grid-template-columns: 300px 1fr; gap: 24px; max-width: 1280px; margin: 20px auto; padding: 0 16px 40px; }
+    .sidebar {
+      position: sticky; top: 20px; align-self: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px 16px; max-height: calc(100vh - 40px); overflow: auto;
+    }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a { display: block; text-decoration: none; color: var(--text); padding: 8px 10px; border-radius: 10px; border: 1px solid transparent; transition: all .15s ease; }
+    .toc a:hover { background: #0b1220; border-color: var(--border); }
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .hero { position: relative; background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06)); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .hero:after { content: ""; position: absolute; top: -40px; right: -60px; width: 220px; height: 220px; background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%); filter: blur(6px); pointer-events: none; }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+    section.card { background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 18px; box-shadow: var(--shadow); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe; border-bottom: 1px solid var(--border); user-select: none; }
+    summary::-webkit-details-marker { display:none; }
+    .details-body { padding: 12px 14px; color: var(--text); }
+    .callout { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02)); padding: 10px 12px; border-radius: 10px; margin: 10px 0; }
+    .note { color: var(--muted); font-size: 14px; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+    @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } .grid-3 { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#basics">Basics & Definitions (Q1–Q6)</a></li>
+        <li><a href="#components">Routers & P2P (Q7–Q8)</a></li>
+        <li><a href="#osi">OSI Model (Q9–Q10)</a></li>
+        <li><a href="#access">Access & Services (Q11–Q13)</a></li>
+        <li><a href="#tcpip">TCP/IP & Comparison (Q14–Q16)</a></li>
+        <li><a href="#media">Cabling & HTTP/NAT/TCP/UDP (Q17–Q22)</a></li>
+        <li><a href="#routing">Routing & Security (Q23–Q26)</a></li>
+        <li><a href="#standards">Standards & Addressing (Q27–Q31)</a></li>
+        <li><a href="#domaining">Domains & OSPF/RTT/DHCP (Q32–Q35)</a></li>
+        <li><a href="#icmp">ICMP/Ping/Fiber/Client-Server (Q36–Q39)</a></li>
+        <li><a href="#lan">AV/Ethernet/SLIP/CSMA (Q40–Q43)</a></li>
+        <li><a href="#ipsec">IPsec/IPv6/Crypto (Q44–Q46)</a></li>
+        <li><a href="#misc">Encoders/Decoders/Sneakernet/Protocol (Q47–Q50)</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">Networking Interview Q&A — Comprehensive Notes</h1>
+        <p class="subtitle">All 50 questions from the video captured precisely, with added explanations, examples, and interview tips for SDE roles.</p>
+        <div class="chips">
+          <span class="chip">OSI/TCP-IP</span>
+          <span class="chip">Routing</span>
+          <span class="chip">DNS/DHCP/NAT</span>
+          <span class="chip">TCP/UDP</span>
+          <span class="chip">Security</span>
+          <span class="chip">LAN/WAN</span>
+        </div>
+      </header>
+
+      <section id="intro" class="card">
+        <h2>Introduction</h2>
+        <p><b>Video</b>: Networking Interview Questions and Answers | Edureka</p>
+        <p><b>Speaker</b>: Vajiha</p>
+        <p><b>Goal</b>: Cover the 50 most important networking interview questions with concise explanations.</p>
+        <p class="note">These notes include clarifications and extra insights to match modern practice.</p>
+      </section>
+
+      <section id="basics" class="card">
+        <h2>Basics & Definitions (Q1–Q6)</h2>
+
+        <details open>
+          <summary>Q1. Differentiate between a Router, a Hub, and a Switch</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Hub</b>: L1 repeater; broadcasts frames to all ports; no filtering; legacy.</li>
+              <li><b>Switch</b>: L2; forwards by MAC table; isolates collisions; VLAN support.</li>
+              <li><b>Router</b>: L3; routes by IP; performs NAT, ACLs; connects LAN/MAN/WAN.</li>
+            </ul>
+            <div class="callout"><b>Tip</b>: In modern networks, hubs are obsolete; switches dominate at access/aggregation.</div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Q2. What is a Link?</summary>
+          <div class="details-body">
+            A physical or wireless connection between nodes (copper, fiber, Wi‑Fi). Links have capacity (bandwidth), latency, and error characteristics.
+          </div>
+        </details>
+
+        <details>
+          <summary>Q3. What is a Node?</summary>
+          <div class="details-body">Any device that can send/receive data: host, printer, router, switch.</div>
+        </details>
+
+        <details>
+          <summary>Q4. What is a Backbone Network?</summary>
+          <div class="details-body">High-capacity core interconnecting distribution/access networks; often redundant and using higher-speed links (10/40/100G).</div>
+        </details>
+
+        <details>
+          <summary>Q5. What is Network Topology?</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Bus</b>: shared medium; a single break can affect many.</li>
+              <li><b>Star</b>: central hub/switch; easy to manage; single hub failure impact.</li>
+              <li><b>Ring</b>: each node connects to two neighbors; token-based variants.</li>
+              <li><b>Mesh</b>: multiple interconnections; resilient; complex.</li>
+              <li><b>Tree</b>: hierarchical star/bus mix.</li>
+              <li><b>Daisy chain</b>: linear series; limited resilience.</li>
+              <li><b>Hybrid</b>: mix of types; common in enterprises.</li>
+              <li><b>Point-to-Point</b>: dedicated link between two devices.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Q6. What is a LAN?</summary>
+          <div class="details-body">Local Area Network within limited area; wired (Ethernet) or wireless (Wi‑Fi). Varies by topology, protocols, and media.</div>
+        </details>
+      </section>
+
+      <section id="components" class="card">
+        <h2>Routers & P2P (Q7–Q8)</h2>
+        <details open>
+          <summary>Q7. What are Routers?</summary>
+          <div class="details-body">Layer 3 devices at gateways; forward packets by routing table; can be hardware or virtual; often perform NAT, QoS, ACLs.</div>
+        </details>
+        <details>
+          <summary>Q8. What is a Point-to-Point Network?</summary>
+          <div class="details-body">A direct link between two nodes (e.g., dedicated fiber, serial line); predictable performance; simpler addressing.</div>
+        </details>
+      </section>
+
+      <section id="osi" class="card">
+        <h2>OSI Model (Q9–Q10)</h2>
+        <details open>
+          <summary>Q9. What is the OSI Model?</summary>
+          <div class="details-body">
+            Conceptual 7-layer model: Physical, Data Link, Network, Transport, Session, Presentation, Application.
+            <div class="note">Transport is the core for end-to-end reliability and multiplexing.</div>
+          </div>
+        </details>
+        <details>
+          <summary>Q10. Brief description of each OSI layer</summary>
+          <div class="details-body grid-2">
+            <ul>
+              <li><b>Physical</b>: bits; cables, optics, RF.</li>
+              <li><b>Data Link</b>: frames; MAC, switches, ARP.</li>
+              <li><b>Network</b>: packets; IP routing, ICMP.</li>
+              <li><b>Transport</b>: segments/datagrams; TCP/UDP, ports.</li>
+              <li><b>Session</b>: dialogs, checkpoints.</li>
+              <li><b>Presentation</b>: formats, encryption, compression.</li>
+              <li><b>Application</b>: HTTP, DNS, SMTP, FTP, etc.</li>
+            </ul>
+            <div class="callout">PDU names: Frame (L2), Packet (L3), Segment (TCP), Datagram (UDP).</div>
+          </div>
+        </details>
+      </section>
+
+      <section id="access" class="card">
+        <h2>Access & Services (Q11–Q13)</h2>
+        <details open>
+          <summary>Q11. What is Anonymous FTP?</summary>
+          <div class="details-body">Public file access by logging in as <code>anonymous</code>; minimal auth. <b>Modern note</b>: replaced by HTTPS/CDN/object storage for security.</div>
+        </details>
+        <details>
+          <summary>Q12. What is a Network?</summary>
+          <div class="details-body">Connected devices via physical (twisted pair, fiber, coax) or wireless (Wi‑Fi, microwave). Purpose: share resources, communicate, exchange data.</div>
+        </details>
+        <details>
+          <summary>Q13. What is a Subnet Mask?</summary>
+          <div class="details-body">
+            32-bit mask splits IP into network and host portions. Network bits = 1, host bits = 0.
+            <pre><code>Example: 192.168.1.42/24 → mask 255.255.255.0
+Network = 192.168.1.0, Broadcast = 192.168.1.255
+Usable hosts = 254 (1–254)</code></pre>
+            <div class="note">Use CIDR notation /n; avoid assigning network/broadcast addresses.</div>
+          </div>
+        </details>
+      </section>
+
+      <section id="tcpip" class="card">
+        <h2>TCP/IP & Comparison (Q14–Q16)</h2>
+        <details open>
+          <summary>Q14. TCP/IP Model</summary>
+          <div class="details-body">
+            4 layers: Link (L2), Internet (IP/ICMP/ARP), Transport (TCP/UDP), Application (HTTP/DNS/SMTP...).
+            <div class="note">TCP/IP predates OSI; widely used in real systems.</div>
+          </div>
+        </details>
+        <details>
+          <summary>Q15. Difference between OSI and TCP/IP</summary>
+          <div class="details-body">
+            OSI is 7-layer conceptual reference; TCP/IP is 4-layer practical suite. <b>Reliability</b> is a property of protocols (e.g., TCP) not the model.
+          </div>
+        </details>
+        <details>
+          <summary>Q16. What is a UTP cable?</summary>
+          <div class="details-body">Unshielded Twisted Pair copper; twists reduce EMI. Categories (Cat5e, Cat6, Cat6a) define bandwidth and max frequency.</div>
+        </details>
+      </section>
+
+      <section id="media" class="card">
+        <h2>Cabling & HTTP/NAT/TCP/UDP (Q17–Q22)</h2>
+        <details open>
+          <summary>Q17. Max length for a UTP cable</summary>
+          <div class="details-body">100 meters per Ethernet segment (90 m permanent link + 10 m patch cords typical).</div>
+        </details>
+        <details>
+          <summary>Q18. What is HTTP and its port?</summary>
+          <div class="details-body">Hypertext Transfer Protocol, stateless, media-independent. Default port 80 (HTTPS 443). Methods, headers, caching define behavior.</div>
+        </details>
+        <details>
+          <summary>Q19. What is NAT?</summary>
+          <div class="details-body">
+            Translates private↔public addresses. Types: <b>SNAT</b> (source), <b>DNAT</b> (destination), <b>PAT</b> (port address translation). Hides internal IPs, conserves IPv4.
+          </div>
+        </details>
+        <details>
+          <summary>Q20. What is TCP?</summary>
+          <div class="details-body">Reliable, ordered, connection-oriented transport with flow + congestion control. Segments data, uses ports, 3-way handshake.</div>
+        </details>
+        <details>
+          <summary>Q21. Brief explanation of UDP</summary>
+          <div class="details-body">Connectionless, best-effort transport; no ordering or retransmissions; ideal for realtime, DNS, QUIC base.</div>
+        </details>
+        <details>
+          <summary>Q22. Differentiate between TCP and UDP</summary>
+          <div class="details-body grid-2">
+            <ul>
+              <li>TCP: reliable, ordered, ACKs, congestion/flow control.</li>
+              <li>UDP: unordered, no reliability; app-level handling if needed.</li>
+            </ul>
+            <ul>
+              <li>Use TCP for files, DB, critical RPCs; UDP/QUIC for realtime and low latency.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="routing" class="card">
+        <h2>Routing & Security (Q23–Q26)</h2>
+        <details open>
+          <summary>Q23. What is RIP?</summary>
+          <div class="details-body">Routing Information Protocol; distance-vector; metric = hop count; v1 (classful), v2 (CIDR, auth), UDP/520; AD=120.</div>
+        </details>
+        <details>
+          <summary>Q24. What is a Firewall?</summary>
+          <div class="details-body">Filters traffic per rules; network (perimeter) or host-based; L3–L7; can include IDS/IPS and WAF capabilities.</div>
+        </details>
+        <details>
+          <summary>Q25. What is NOS?</summary>
+          <div class="details-body">Network Operating System: OS with networking features for services, auth, file/print, clustering (e.g., Linux, Windows Server).</div>
+        </details>
+        <details>
+          <summary>Q26. What is Denial of Service (DoS)?</summary>
+          <div class="details-body">Overwhelming a target to degrade/deny service. Mitigations: rate limiting, scrubbing, CAPTCHAs, autoscaling, anycast.</div>
+        </details>
+      </section>
+
+      <section id="standards" class="card">
+        <h2>Standards & Addressing (Q27–Q31)</h2>
+        <details open>
+          <summary>Q27. Full form of ASCII</summary>
+          <div class="details-body">American Standard Code for Information Interchange, 7-bit historical encoding; UTF‑8 supersedes for i18n.</div>
+        </details>
+        <details>
+          <summary>Q28. What is IEEE?</summary>
+          <div class="details-body">Professional body; 802 standards (Ethernet 802.3, Wi‑Fi 802.11) among many contributions.</div>
+        </details>
+        <details>
+          <summary>Q29. What is a MAC address and why required?</summary>
+          <div class="details-body">48-bit (or 64-bit EUI‑64) L2 identifier for NICs; used for switching and ARP; unique per interface (with exceptions).</div>
+        </details>
+        <details>
+          <summary>Q30. What is Piggybacking?</summary>
+          <div class="details-body">In full-duplex protocols, ACK combined with outbound data to reduce frames; used with sliding windows.</div>
+        </details>
+        <details>
+          <summary>Q31. What is DNS?</summary>
+          <div class="details-body">
+            Translates names ↔ IPs; hierarchical; caching with TTL.
+            <pre><code>nslookup example.com
+dig A example.com +short
+            </code></pre>
+          </div>
+        </details>
+      </section>
+
+      <section id="domaining" class="card">
+        <h2>Domains & OSPF/RTT/DHCP (Q32–Q35)</h2>
+        <details open>
+          <summary>Q32. Domain vs Workgroup</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Domain</b>: centralized directory (AD); policy and auth managed.</li>
+              <li><b>Workgroup</b>: peer-to-peer; local users; small networks.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary>Q33. What is OSPF?</summary>
+          <div class="details-body">Link-state IGP; Dijkstra SPF; areas (backbone Area 0); fast convergence; metrics via cost; supports VLSM.</div>
+        </details>
+        <details>
+          <summary>Q34. What is Round Trip Time?</summary>
+          <div class="details-body">Time from send to response; affected by propagation, queueing, processing; measured by ping/traceroute.</div>
+        </details>
+        <details>
+          <summary>Q35. What is DHCP?</summary>
+          <div class="details-body">Dynamic Host Configuration Protocol; assigns IP, mask, gateway, DNS via DORA (Discover, Offer, Request, Ack); UDP 67/68.</div>
+        </details>
+      </section>
+
+      <section id="icmp" class="card">
+        <h2>ICMP/Ping/Fiber/Client-Server (Q36–Q39)</h2>
+        <details open>
+          <summary>Q36. What is ICMP?</summary>
+          <div class="details-body">Control protocol for errors/diagnostics (e.g., Destination Unreachable, Time Exceeded); not for data transport.</div>
+        </details>
+        <details>
+          <summary>Q37. What is Ping?</summary>
+          <div class="details-body">Sends ICMP Echo Request; expects Echo Reply; checks reachability/latency; may be blocked by firewalls.</div>
+        </details>
+        <details>
+          <summary>Q38. Advantages of Optical Fiber</summary>
+          <div class="details-body">
+            Higher bandwidth, lower attenuation, EMI immunity, lightweight, difficult to tap. Single-mode for long distance; multi-mode for short.
+          </div>
+        </details>
+        <details>
+          <summary>Q39. What is a Client/Server network?</summary>
+          <div class="details-body">Servers provide resources/services; clients request; examples: web, email, print; enables central management.</div>
+        </details>
+      </section>
+
+      <section id="lan" class="card">
+        <h2>AV/Ethernet/SLIP/CSMA (Q40–Q43)</h2>
+        <details open>
+          <summary>Q40. Best place to install antivirus</summary>
+          <div class="details-body">Install on all endpoints and servers; layered security; central management recommended.</div>
+        </details>
+        <details>
+          <summary>Q41. What do you mean by Ethernet?</summary>
+          <div class="details-body">L2 LAN technology (IEEE 802.3); frames, MAC, CSMA/CD (legacy); full-duplex switching today.</div>
+        </details>
+        <details>
+          <summary>Q42. What is SLIP?</summary>
+          <div class="details-body">Serial Line IP; historic encapsulation over serial; superseded by PPP (authentication, error detection, IPCP).</div>
+        </details>
+        <details>
+          <summary>Q43. CSMA/CD vs CSMA/CA</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>CSMA/CD</b>: detect collisions after; used in hub-era Ethernet; obsolete with switches.</li>
+              <li><b>CSMA/CA</b>: avoid collisions via RTS/CTS/backoff; used in Wi‑Fi.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section id="ipsec" class="card">
+        <h2>IPsec/IPv6/Crypto (Q44–Q46)</h2>
+        <details open>
+          <summary>Q44. Tunnel Mode</summary>
+          <div class="details-body">IPsec mode encrypting entire IP packet; used for site-to-site VPNs; adds new outer IP header.</div>
+        </details>
+        <details>
+          <summary>Q45. What is IPv6?</summary>
+          <div class="details-body">128-bit addresses; no NAT needed; SLAAC, Neighbor Discovery; IPSec mandatory support; larger header but more efficient routing.</div>
+        </details>
+        <details>
+          <summary>Q46. Explain RSA briefly</summary>
+          <div class="details-body">Public-key crypto; slow—used to exchange symmetric keys or sign. Modern TLS 1.3 favors ECDHE key exchange and ECDSA for signatures.</div>
+        </details>
+      </section>
+
+      <section id="misc" class="card">
+        <h2>Encoders/Decoders/Sneakernet/Protocol (Q47–Q50)</h2>
+        <details open>
+          <summary>Q47. What is an Encoder?</summary>
+          <div class="details-body">Converts data format; often analog→digital (ADC) or compression/codecs (e.g., H.264 encoder).</div>
+        </details>
+        <details>
+          <summary>Q48. What is a Decoder?</summary>
+          <div class="details-body">Reverse of encoder; digital→analog (DAC) or decode compressed streams.</div>
+        </details>
+        <details>
+          <summary>Q49. What is Sneakernet?</summary>
+          <div class="details-body">Physically moving storage media between machines; high initial latency but high bandwidth (e.g., shipping drives to cloud provider).</div>
+        </details>
+        <details>
+          <summary>Q50. Components of a Protocol</summary>
+          <div class="details-body">
+            <ul>
+              <li><b>Syntax</b>: data format/structure.</li>
+              <li><b>Semantics</b>: meaning of fields and codes.</li>
+              <li><b>Timing</b>: when/rate of transmission; timeouts.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>Extra Knowledge & Interview Tips</h2>
+        <div class="grid-3">
+          <div>
+            <h3>Subnetting quick reference</h3>
+            <pre><code>/24 → 256 addrs, /25 → 128, /26 → 64, /27 → 32, /28 → 16, /29 → 8, /30 → 4
+Private IPv4: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16</code></pre>
+          </div>
+          <div>
+            <h3>Common ports</h3>
+            <pre><code>53 DNS, 67/68 DHCP, 80 HTTP, 123 NTP, 143 IMAP, 443 HTTPS,
+465/587 SMTPS, 993 IMAPS, 995 POP3S, 3306 MySQL, 5432 Postgres</code></pre>
+          </div>
+          <div>
+            <h3>Useful CLI</h3>
+            <pre><code>ping -n 4 example.com
+tracert example.com
+Resolve-DnsName example.com
+curl -v https://example.com</code></pre>
+          </div>
+        </div>
+        <div class="callout"><b>Pitfall</b>: OSI vs TCP/IP are models; don’t claim one is “more reliable”. Discuss specific protocols (TCP reliability vs UDP) and deployment trade-offs.</div>
+      </section>
+
+      <div class="footer-note">Prepared for fast revision and deeper understanding. Good luck in your interviews! 🚀</div>
+    </main>
+  </div>
+</body>
+</html>
+
+
