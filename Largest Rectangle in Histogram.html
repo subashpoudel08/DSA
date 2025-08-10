@@ -198,6 +198,30 @@
     return max_area  # O(N) time, O(N) space
 </code></pre>
         <p class="note">Each index is pushed and popped at most once ⇒ O(N) time; stack uses O(N) space worst-case.</p>
+
+        <h3>C++ Implementation</h3>
+        <pre><code class="language-cpp">class Solution {
+public:
+    int largestRectangleArea(vector&lt;int&gt;&amp; heights) {
+        int n = heights.size();
+        vector&lt;int&gt; st;
+        int right = 0, left = 0, width = 0, maxarea = 0;
+        for (int i = 0; i &lt;= n; i++) {
+            int currentheight = (i == n ? 0 : heights[i]);
+            while (!st.empty() &amp;&amp; heights[st.back()] &gt; currentheight) {
+                int k = st.back();
+                st.pop_back();
+                if (st.empty()) left = -1;
+                else left = st.back();
+                right = i;
+                width = right - left - 1;
+                maxarea = max(maxarea, heights[k] * width);
+            }
+            st.push_back(i);
+        }
+        return maxarea;
+    }
+};</code></pre>
       </section>
 
       
