@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Largest Rectangle in Histogram — Structured Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22d3ee;
+      --accent-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      overflow-y: overlay;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px 40px;
+    }
+    .sidebar {
+      position: sticky; top: 20px; align-self: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+    }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a { display: block; text-decoration: none; color: var(--text); padding: 8px 10px; border-radius: 10px; transition: all .15s ease; border: 1px solid transparent; }
+    .toc a:hover { background: #0b1220; border-color: var(--border); color: #ffffff; }
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .hero { position: relative; background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06)); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .hero:after { content: ""; position: absolute; top: -40px; right: -60px; width: 220px; height: 220px; background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%); filter: blur(6px); pointer-events: none; }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+    section.card { background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 18px; box-shadow: var(--shadow); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .note { color: var(--muted); font-size: 14px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: #0b1220; border: 1px solid var(--border); color: var(--text); font-size: 13px; }
+    .pill b { color: var(--accent); }
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe; border-bottom: 1px solid var(--border); user-select: none; }
+    summary::-webkit-details-marker { display:none; }
+    .details-body { padding: 12px 14px; color: var(--text); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; color: #c7d2fe; font-weight: 600; background: rgba(167,139,250,0.08); }
+    tr:last-child td { border-bottom: none; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+    .callout { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02)); padding: 10px 12px; border-radius: 10px; margin: 10px 0; }
+    .formula { background: #0b1220; border: 1px dashed #1f334d; padding: 10px 12px; border-radius: 10px; }
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+    @media (max-width: 960px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#example">Example & Breakdown</a></li>
+        <li><a href="#brute">Brute-Force Solution</a></li>
+        <li><a href="#two-pass">PSE & NSE (Two-Pass)</a></li>
+        <li><a href="#single-pass">Optimal Single-Pass</a></li>
+        <li><a href="#dry-run">Dry Run</a></li>
+        <li><a href="#pseudocode">Final Algorithm & Pseudocode</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">Largest Rectangle in Histogram | Stacks and Queues</h1>
+        <p class="subtitle">Find the largest rectangle area in a histogram using stack techniques.</p>
+        <div class="chips">
+          <span class="chip">Stack</span>
+          <span class="chip">Monotonic Stack</span>
+          <span class="chip">Arrays</span>
+          <span class="chip">O(N)</span>
+        </div>
+      </header>
+
+      <section id="intro" class="card">
+        <h2>Introduction</h2>
+        <p>The problem is to find the largest rectangle in a given histogram.</p>
+        <ul>
+          <li>You are given an array of integers, each representing the height of a bar.</li>
+          <li>The width of every bar is constant and assumed to be 1.</li>
+        </ul>
+      </section>
+
+      <section id="example" class="card">
+        <h2>Example & Breakdown</h2>
+        <p>Example histogram heights: <code>[2, 1, 5, 6, 2, 3]</code> at indices <code>0</code> to <code>5</code>.</p>
+        <ul>
+          <li>The task is to return the area of the largest rectangle that can be formed.</li>
+          <li>A rectangle is a continuous set of bars, with height equal to the minimum among them.</li>
+          <li>Example 1: height 1 at index 1 spans 6 bars ⇒ area = 6 × 1 = 6.</li>
+          <li>Example 2: height 2 can span indices 2..5 ⇒ width = 4 ⇒ area = 4 × 2 = 8.</li>
+          <li>Example 3 (largest here): bars of heights 5 and 6 ⇒ width = 2, height = 5 ⇒ area = 10.</li>
+        </ul>
+      </section>
+
+      <section id="brute" class="card">
+        <h2>Brute-Force Solution</h2>
+        <ul>
+          <li>Iterate each bar as the limiting height; expand left and right while bars ≥ current height.</li>
+          <li>Width = number of included bars; area = height × width; track maximum.</li>
+          <li class="note">Time complexity: O(N²)</li>
+        </ul>
+      </section>
+
+      <section id="two-pass" class="card">
+        <h2>PSE & NSE (Two-Pass)</h2>
+        <p>For each bar <code>heights[i]</code>, find boundaries:</p>
+        <ul>
+          <li>PSE: first index to the left with smaller height; use -1 if none.</li>
+          <li>NSE: first index to the right with smaller height; use <code>n</code> if none.</li>
+          <li>Width = <code>NSE - PSE - 1</code>, area = <code>heights[i] × width</code>.</li>
+          <li>Three passes: compute PSE, compute NSE, then compute max area ⇒ O(N) time, O(N) space.</li>
+        </ul>
+      </section>
+
+      <section id="single-pass" class="card">
+        <h2>Optimal Single-Pass</h2>
+        <ul>
+          <li>Maintain a stack of indices with increasing heights.</li>
+          <li>When current height is smaller than stack top’s height, pop and compute area for that bar.</li>
+          <li>For a popped index <code>p</code>: height = <code>heights[p]</code>, right = current index, left = new stack top (or -1), width = <code>right - left - 1</code>.</li>
+          <li>After the scan, pop remaining bars using right = <code>n</code>.</li>
+        </ul>
+      </section>
+
+      <section id="dry-run" class="card">
+        <h2>Dry Run</h2>
+        <p>Example: <code>[3, 2, 10, 11, 5, 10, 6, 3]</code></p>
+        <div class="details-body">
+          <ul>
+            <li>i=0, h=3 → push 0</li>
+            <li>i=1, h=2 → pop 0 ⇒ area = 3 × (1 - (-1) - 1) = 3; push 1</li>
+            <li>i=2, h=10 → push 2</li>
+            <li>i=3, h=11 → push 3</li>
+            <li>i=4, h=5 → pop 3 ⇒ area 11 × (4 - 2 - 1) = 11; pop 2 ⇒ area 10 × (4 - 1 - 1) = 20; push 4</li>
+            <li>i=5, h=10 → push 5</li>
+            <li>i=6, h=6 → pop 5 ⇒ area 10 × (6 - 4 - 1) = 10; push 6</li>
+            <li>i=7, h=3 → pop 6 ⇒ area 6 × (7 - 4 - 1) = 12; pop 4 ⇒ area 5 × (7 - 1 - 1) = 25; push 7</li>
+            <li>End: stack [1,7]. Pop 7 ⇒ area 3 × (8 - 1 - 1) = 18; pop 1 ⇒ area 2 × (8 - (-1) - 1) = 16</li>
+            <li><b>Max area = 25</b></li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="pseudocode" class="card">
+        <h2>Final Algorithm & Pseudocode</h2>
+        <pre><code>def largestRectangleArea(heights):
+    n = len(heights)
+    stack = []  # store indices of increasing heights
+    max_area = 0
+    for i in range(n + 1):  # include sentinel at n
+        curr = heights[i] if i < n else 0
+        while stack and (i == n or curr < heights[stack[-1]]):
+            h = heights[stack.pop()]
+            left = stack[-1] if stack else -1
+            width = i - left - 1
+            max_area = max(max_area, h * width)
+        stack.append(i)
+    return max_area  # O(N) time, O(N) space
+</code></pre>
+        <p class="note">Each index is pushed and popped at most once ⇒ O(N) time; stack uses O(N) space worst-case.</p>
+      </section>
+
+      
+
+      <section id="conclusion" class="card">
+        <h2>Conclusion</h2>
+        <ul>
+          <li>Summarizes the single-pass optimal solution.</li>
+          <li>Time complexity O(N), space O(N); clean stack-based approach.</li>
+        </ul>
+      </section>
+
+      <div class="footer-note">Optimized for quick revision. 🚀</div>
+    </main>
+  </div>
+</body>
+</html>
+
