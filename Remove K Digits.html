@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Remove K Digits — Structured Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22d3ee;
+      --accent-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      overflow-y: overlay;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px 40px;
+    }
+    .sidebar {
+      position: sticky; top: 20px; align-self: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+    }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a { display: block; text-decoration: none; color: var(--text); padding: 8px 10px; border-radius: 10px; transition: all .15s ease; border: 1px solid transparent; }
+    .toc a:hover { background: #0b1220; border-color: var(--border); color: #ffffff; }
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .hero { position: relative; background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06)); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .hero:after { content: ""; position: absolute; top: -40px; right: -60px; width: 220px; height: 220px; background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%); filter: blur(6px); pointer-events: none; }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+    section.card { background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 18px; box-shadow: var(--shadow); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .note { color: var(--muted); font-size: 14px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: #0b1220; border: 1px solid var(--border); color: var(--text); font-size: 13px; }
+    .pill b { color: var(--accent); }
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe; border-bottom: 1px solid var(--border); user-select: none; }
+    summary::-webkit-details-marker { display:none; }
+    .details-body { padding: 12px 14px; color: var(--text); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; color: #c7d2fe; font-weight: 600; background: rgba(167,139,250,0.08); }
+    tr:last-child td { border-bottom: none; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+    .callout { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02)); padding: 10px 12px; border-radius: 10px; margin: 10px 0; }
+    .formula { background: #0b1220; border: 1px dashed #1f334d; padding: 10px 12px; border-radius: 10px; }
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+    @media (max-width: 960px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } }
+
+    /* Quiz helpers */
+    .quiz { display: grid; gap: 12px; }
+    .quiz .q { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; padding: 12px; }
+    .quiz .choice { display: block; margin: 6px 0; }
+    .quiz .ans { display: none; margin-top: 8px; color: var(--ok); }
+    .quiz .reveal { margin-top: 8px; }
+    .quiz button { background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+    .quiz button:hover { border-color: var(--accent); color: #ffffff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#example">Example & Breakdown</a></li>
+        <li><a href="#brute">Brute-Force Baseline</a></li>
+        <li><a href="#two-pass">Greedy Criterion & Invariant</a></li>
+        <li><a href="#single-pass">Single-Pass Stack Algorithm</a></li>
+        <li><a href="#dry-run">Dry Run</a></li>
+        <li><a href="#pseudocode">Pseudocode & Implementations</a></li>
+        <li><a href="#conclusion">Conclusion + Quiz</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">Remove K Digits | Greedy + Stack</h1>
+        <p class="subtitle">Given a numeric string and integer k, remove exactly k digits to form the smallest possible number.</p>
+        <div class="chips">
+          <span class="chip">Greedy</span>
+          <span class="chip">Stack</span>
+          <span class="chip">Monotonic</span>
+          <span class="chip">O(N)</span>
+          <span class="chip">Strings</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="pill"><b>Reading time:</b> ~9 min</span>
+          <span class="pill"><b>Keywords:</b> remove k digits, smallest number, monotonic stack, greedy</span>
+        </div>
+      </header>
+
+      <section id="intro" class="card">
+        <h2>Introduction</h2>
+        <p>Problem: Given a string <code>num</code> of digits <code>0-9</code> and an integer <code>k</code>, remove exactly <code>k</code> digits so that the resulting number is as small as possible. If the result has leading zeros, strip them; if all digits are removed, return <code>"0"</code>.</p>
+
+        <h3>Summary</h3>
+        <ul>
+          <li>Maintain a <b>monotonic increasing</b> stack of digits from left to right.</li>
+          <li>While the current digit is smaller than the stack top and <code>k &gt; 0</code>, pop from the stack (remove larger, earlier digits).</li>
+          <li>If any removals remain after traversal, pop from the end (largest suffix digits).</li>
+          <li>Build the string from the stack, <b>strip leading zeros</b>; return <code>"0"</code> if empty.</li>
+          <li>Time complexity is effectively <b>O(N)</b>; each digit is pushed and popped at most once.</li>
+        </ul>
+      </section>
+
+      <section id="example" class="card">
+        <h2>Example & Breakdown</h2>
+        <p>Example: <code>num = "1432219"</code>, <code>k = 3</code>.</p>
+        <ul>
+          <li>A non-optimal removal like removing <code>4</code>, <code>3</code>, and one <code>2</code> can yield <code>"1229"</code>.</li>
+          <li>The optimal strategy removes <code>4</code>, <code>3</code>, and the first <code>2</code>, yielding <b><code>"1219"</code></b>.</li>
+          <li>Why optimal? Removing larger digits that occur earlier shrinks the number most at higher place values.</li>
+        </ul>
+        <div class="callout">Greedy insight: Prefer smaller digits in the most significant positions by deleting preceding larger peaks.</div>
+      </section>
+
+      <section id="brute" class="card">
+        <h2>Brute-Force Baseline</h2>
+        <ul>
+          <li>Enumerate all ways to remove <code>k</code> positions from <code>num</code> and take the minimum of the resulting integers.</li>
+          <li>There are <code>C(n, k)</code> possibilities; generating and comparing each is exponential in practice.</li>
+          <li>Even with pruning, this is infeasible for typical constraints; motivates a linear-time greedy approach.</li>
+        </ul>
+      </section>
+
+      <section id="two-pass" class="card">
+        <h2>Greedy Criterion & Invariant</h2>
+        <p>The output’s digits should be as small as possible, as early as possible. Maintain the invariant that the container of chosen digits is <b>non-decreasing</b>:</p>
+        <ul>
+          <li>Whenever a new digit <code>d</code> is less than the last chosen digit and <code>k &gt; 0</code>, remove the last chosen digit.</li>
+          <li>This locally optimal removal is globally optimal because earlier positions have higher significance.</li>
+          <li>If no more beneficial removals are possible during the scan, any remaining <code>k</code> must be spent by removing a suffix (largest on the right).</li>
+        </ul>
+      </section>
+
+      <section id="single-pass" class="card">
+        <h2>Single-Pass Stack Algorithm</h2>
+        <ul>
+          <li>Traverse digits left to right with a stack (or dynamic string).</li>
+          <li>While <code>k &gt; 0</code> and the stack isn’t empty and <code>stack.top() &gt; currentDigit</code>, pop.</li>
+          <li>Push the current digit.</li>
+          <li>After traversal, if <code>k &gt; 0</code>, pop the last <code>k</code> digits.</li>
+          <li>Build the answer from the stack and strip leading zeros; if empty, return <code>"0"</code>.</li>
+        </ul>
+        <p class="note">Using a string as a stack (push_back/pop_back) is common and efficient.</p>
+      </section>
+
+      <section id="dry-run" class="card">
+        <h2>Dry Run</h2>
+        <p>Input: <code>num = "1432219"</code>, <code>k = 3</code></p>
+        <div class="details-body">
+          <ul>
+            <li>Start: stack = [], k = 3</li>
+            <li>See '1': push → [1], k = 3</li>
+            <li>See '4': '4' ≥ '1' → push → [1, 4], k = 3</li>
+            <li>See '3': '3' &lt; '4' and k&gt;0 → pop '4' (k=2), now top '1' &lt; '3' → push '3' → [1, 3]</li>
+            <li>See '2': '2' &lt; '3' and k&gt;0 → pop '3' (k=1), top '1' &lt; '2' → push '2' → [1, 2]</li>
+            <li>See '2': '2' = top → push → [1, 2, 2], k = 1</li>
+            <li>See '1': '1' &lt; '2' and k&gt;0 → pop '2' (k=0). Cannot pop further → push '1' → [1, 2, 1]</li>
+            <li>See '9': k=0 → push → [1, 2, 1, 9]</li>
+            <li>Result from stack → "1219" (after assembly and zero-trim)</li>
+          </ul>
+        </div>
+        <div class="callout"><b>Edge cases:</b> k = n ⇒ "0"; monotonically increasing input ⇒ remove from the end; handle leading zeros after construction.</div>
+      </section>
+
+      <section id="pseudocode" class="card">
+        <h2>Pseudocode & Implementations</h2>
+        <pre><code class="language-text">function removeKdigits(s, k):
+    stack = empty list
+    for each digit d in s:
+        while stack not empty and k &gt; 0 and stack.back() &gt; d:
+            stack.pop_back()
+            k -= 1
+        stack.push_back(d)
+
+    # remove remaining k from the end (largest suffix)
+    while k &gt; 0 and stack not empty:
+        stack.pop_back()
+        k -= 1
+
+    # build and strip leading zeros
+    res = string from stack
+    remove leading zeros from res
+
+    if res is empty:
+        return "0"
+    return res
+</code></pre>
+
+        <h3>C++ Implementation</h3>
+        <pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+string removeKdigits(string num, int k) {
+    string st;
+    st.reserve(num.size());
+    for (char c : num) {
+        while (!st.empty() && k > 0 && st.back() > c) {
+            st.pop_back();
+            --k;
+        }
+        st.push_back(c);
+    }
+    while (k > 0 && !st.empty()) {
+        st.pop_back();
+        --k;
+    }
+    // strip leading zeros
+    size_t pos = st.find_first_not_of('0');
+    string res = (pos == string::npos) ? "" : st.substr(pos);
+    return res.empty() ? "0" : res;
+}
+</code></pre>
+
+        <h3>Java Implementation</h3>
+        <pre><code class="language-java">class Solution {
+    public String removeKdigits(String num, int k) {
+        StringBuilder st = new StringBuilder();
+        for (int i = 0; i &lt; num.length(); i++) {
+            char c = num.charAt(i);
+            while (st.length() &gt; 0 && k &gt; 0 && st.charAt(st.length() - 1) &gt; c) {
+                st.deleteCharAt(st.length() - 1);
+                k--;
+            }
+            st.append(c);
+        }
+        while (k &gt; 0 && st.length() &gt; 0) {
+            st.deleteCharAt(st.length() - 1);
+            k--;
+        }
+        // strip leading zeros
+        int idx = 0;
+        while (idx &lt; st.length() && st.charAt(idx) == '0') idx++;
+        String res = idx == st.length() ? "" : st.substring(idx);
+        return res.isEmpty() ? "0" : res;
+    }
+}
+</code></pre>
+
+        <h3>Complexity</h3>
+        <ul>
+          <li><b>Time:</b> Each digit is pushed and popped at most once ⇒ O(N).</li>
+          <li><b>Space:</b> Stack/string holds up to N digits ⇒ O(N).</li>
+        </ul>
+      </section>
+
+      <section id="conclusion" class="card">
+        <h2>Conclusion</h2>
+        <ul>
+          <li>Use a monotonic increasing stack to favor smaller digits in higher places.</li>
+          <li>Spend remaining removals on the suffix after the main scan.</li>
+          <li>Normalize by stripping leading zeros; return "0" if empty.</li>
+          <li>Runs in linear time with linear auxiliary space.</li>
+        </ul>
+
+        <h3>Interactive Quiz</h3>
+        <div class="quiz" id="quiz">
+          <!-- Q1 MCQ -->
+          <div class="q">
+            <div><b>1) What is the primary goal of the algorithm?</b></div>
+            <label class="choice"><input type="radio" name="q1"> Maximize the resulting number after removing k digits</label>
+            <label class="choice"><input type="radio" name="q1"> Keep the first k digits unchanged</label>
+            <label class="choice"><input type="radio" name="q1"> Randomly remove k digits</label>
+            <label class="choice"><input type="radio" name="q1"> Minimize the resulting number after removing k digits</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">Minimize the resulting number after removing k digits.</div></details>
+          </div>
+
+          <!-- Q2 MCQ -->
+          <div class="q">
+            <div><b>2) When do we pop from the stack during traversal?</b></div>
+            <label class="choice"><input type="radio" name="q2"> If the current digit is equal to the top</label>
+            <label class="choice"><input type="radio" name="q2"> If the current digit is greater than the top</label>
+            <label class="choice"><input type="radio" name="q2"> If the current digit is smaller than the top and k &gt; 0</label>
+            <label class="choice"><input type="radio" name="q2"> Never pop during traversal</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">If the current digit is smaller than the top and k &gt; 0.</div></details>
+          </div>
+
+          <!-- Q3 SA -->
+          <div class="q">
+            <div><b>3) Short answer:</b> For <code>num="1432219"</code>, <code>k=3</code>, what is the result?</div>
+            <button data-target="a3">Reveal answer</button>
+            <div id="a3" class="ans">1219</div>
+          </div>
+
+          <!-- Q4 MCQ -->
+          <div class="q">
+            <div><b>4) After the main loop, if k &gt; 0, what should we do?</b></div>
+            <label class="choice"><input type="radio" name="q4"> Insert zeros at the front</label>
+            <label class="choice"><input type="radio" name="q4"> Pop k digits from the end (suffix)</label>
+            <label class="choice"><input type="radio" name="q4"> Restart the algorithm</label>
+            <label class="choice"><input type="radio" name="q4"> Do nothing</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">Pop k digits from the end (suffix).</div></details>
+          </div>
+
+          <!-- Q5 SA -->
+          <div class="q">
+            <div><b>5) Short answer:</b> If all digits are removed or only zeros remain after trimming, what should be returned?</div>
+            <button data-target="a5">Reveal answer</button>
+            <div id="a5" class="ans">"0"</div>
+          </div>
+
+          <!-- Q6 MCQ -->
+          <div class="q">
+            <div><b>6) What is the time complexity?</b></div>
+            <label class="choice"><input type="radio" name="q6"> O(N log N)</label>
+            <label class="choice"><input type="radio" name="q6"> O(N)</label>
+            <label class="choice"><input type="radio" name="q6"> O(N^2)</label>
+            <label class="choice"><input type="radio" name="q6"> O(1)</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">O(N), each digit is pushed and popped at most once.</div></details>
+          </div>
+
+          <!-- Q7 SA -->
+          <div class="q">
+            <div><b>7) Short answer:</b> For <code>num="123456"</code>, <code>k=3</code>, what is the result?</div>
+            <button data-target="a7">Reveal answer</button>
+            <div id="a7" class="ans">123</div>
+          </div>
+
+          <!-- Q8 MCQ -->
+          <div class="q">
+            <div><b>8) Why does the greedy removal of earlier larger digits make sense?</b></div>
+            <label class="choice"><input type="radio" name="q8"> Earlier positions have higher positional weight</label>
+            <label class="choice"><input type="radio" name="q8"> It reduces memory usage</label>
+            <label class="choice"><input type="radio" name="q8"> It increases the number of pops</label>
+            <label class="choice"><input type="radio" name="q8"> It avoids zero trimming</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">Earlier positions have higher positional weight.</div></details>
+          </div>
+
+          <!-- Q9 SA -->
+          <div class="q">
+            <div><b>9) Short answer:</b> For <code>num="10"</code>, <code>k=1</code>, what is the result after trimming leading zeros?</div>
+            <button data-target="a9">Reveal answer</button>
+            <div id="a9" class="ans">0</div>
+          </div>
+
+          <!-- Q10 SA -->
+          <div class="q">
+            <div><b>10) Short answer:</b> For <code>num="10200"</code>, <code>k=1</code>, what is the result?</div>
+            <button data-target="a10">Reveal answer</button>
+            <div id="a10" class="ans">200</div>
+          </div>
+
+          <!-- Q11 MCQ -->
+          <div class="q">
+            <div><b>11) What data structure is used to maintain non-decreasing digits?</b></div>
+            <label class="choice"><input type="radio" name="q11"> Queue</label>
+            <label class="choice"><input type="radio" name="q11"> Priority queue</label>
+            <label class="choice"><input type="radio" name="q11"> Stack (or string as a stack)</label>
+            <label class="choice"><input type="radio" name="q11"> Deque only</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">Stack (often implemented as a dynamic string with push_back/pop_back).</div></details>
+          </div>
+
+          <!-- Q12 SA -->
+          <div class="q">
+            <div><b>12) Short answer:</b> If <code>k</code> equals the length of the string, what is the final result?</div>
+            <button data-target="a12">Reveal answer</button>
+            <div id="a12" class="ans">0</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer-note">Optimized for quick revision. 🚀</div>
+    </main>
+  </div>
+
+  <script>
+    // Simple toggle for short-answer reveal buttons
+    (function () {
+      document.querySelectorAll('.quiz button[data-target]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var id = btn.getAttribute('data-target');
+          var ans = document.getElementById(id);
+          if (!ans) return;
+          var visible = ans.style.display === 'block';
+          ans.style.display = visible ? 'none' : 'block';
+          btn.textContent = visible ? 'Reveal answer' : 'Hide answer';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
