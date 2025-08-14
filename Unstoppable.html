@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unstoppable — Do the Boring Things Exceptionally Long</title>
+    <meta name="description" content="A mind-blowing manifesto and action plan: do the boring things for an exceptionally long time until discipline becomes your edge." />
+    <style>
+      /* Typography */
+      :root {
+        --bg: #080914;
+        --bg-2: #0c0f24;
+        --text: #e9ecf1;
+        --muted: #9aa4b2;
+        --brand: #8a7cfb;
+        --accent: #43d1ff;
+        --hot: #ff6b6b;
+        --lime: #9aff6b;
+        --glass: 18, 20, 40;
+        --radius: 16px;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        color: var(--text);
+        background: radial-gradient(1200px 900px at 20% -10%, #1b1038 0%, transparent 60%),
+                    radial-gradient(900px 700px at 110% 10%, #0b2a3c 0%, transparent 60%),
+                    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      /* Animated gradient orbs */
+      .orbs {
+        position: fixed;
+        inset: -20vh -20vw;
+        z-index: -1;
+        filter: blur(60px) saturate(140%);
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      .orb {
+        position: absolute;
+        width: 40vmax; height: 40vmax;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #8a7cfb 0%, transparent 60%);
+        animation: float 18s ease-in-out infinite;
+        mix-blend-mode: screen;
+      }
+      .orb:nth-child(2) { background: radial-gradient(circle at 60% 40%, #43d1ff 0%, transparent 60%); animation-duration: 22s; }
+      .orb:nth-child(3) { background: radial-gradient(circle at 40% 60%, #ff6bca 0%, transparent 60%); animation-duration: 26s; }
+      .orb.one { left: -10vmax; top: -6vmax; }
+      .orb.two { right: -8vmax; top: 10vmax; }
+      .orb.three { left: 20vmax; bottom: -12vmax; }
+      @keyframes float {
+        0%, 100% { transform: translate3d(0, 0, 0) rotate(0.001deg); }
+        50% { transform: translate3d(4vmax, -3vmax, 0) rotate(0.001deg); }
+      }
+
+      /* Header / Nav */
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(12px);
+        background: rgba(var(--glass), 0.45);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .nav {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: var(--text);
+      }
+      .brand .dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: conic-gradient(from 0deg, var(--brand), var(--accent), var(--hot), var(--lime), var(--brand));
+        box-shadow: 0 0 12px rgba(138,124,251,0.65);
+      }
+      .links { display: flex; flex-wrap: wrap; gap: 18px; }
+      .links a { color: var(--muted); font-weight: 600; }
+      .links a:hover { color: var(--text); }
+
+      /* Hero */
+      .section { padding: 80px 20px; }
+      .hero {
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding-top: 100px;
+        padding-bottom: 100px;
+      }
+      .headline {
+        font-size: clamp(36px, 6.5vw, 84px);
+        font-weight: 900;
+        letter-spacing: -1.2px;
+        line-height: 1.02;
+        margin: 0 0 16px;
+        background: linear-gradient(180deg, #fff, #b7c2ff 50%, #8a7cfb 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        text-shadow: 0 0 0 rgba(0,0,0,0);
+      }
+      .subhead {
+        max-width: 920px;
+        color: var(--muted);
+        font-size: clamp(16px, 2.2vw, 22px);
+        margin: 0 auto 28px;
+      }
+      .cta-row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+      .btn {
+        padding: 12px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+        font-weight: 700;
+        box-shadow: var(--shadow);
+        transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+        cursor: pointer;
+      }
+      .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.10); }
+      .btn.primary {
+        background: linear-gradient(135deg, var(--brand), var(--accent));
+        border: none;
+        color: #0b0f1a;
+      }
+      .btn.primary:hover { box-shadow: 0 12px 30px rgba(67, 209, 255, 0.35); }
+
+      /* Containers and cards */
+      .container { max-width: 1200px; margin: 0 auto; }
+      .grid { display: grid; gap: 16px; }
+      .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      @media (max-width: 900px) {
+        .grid.cols-3 { grid-template-columns: 1fr; }
+        .grid.cols-2 { grid-template-columns: 1fr; }
+      }
+      .card {
+        background: rgba(var(--glass), 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+      .card h3 { margin: 0 0 6px; font-size: 22px; }
+      .card p { margin: 0; color: var(--muted); }
+
+      .kicker { color: var(--accent); font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-size: 12px; opacity: .9; }
+      .title { font-size: clamp(22px, 3vw, 40px); margin: 10px 0 28px; font-weight: 900; }
+
+      /* Fancy lists */
+      .list { display: grid; gap: 12px; }
+      .list .item {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 12px;
+        align-items: start;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 14px 16px;
+        border-radius: 12px;
+      }
+      .badge {
+        height: 28px; width: 28px; border-radius: 50%;
+        display: grid; place-items: center; font-weight: 800; font-size: 13px;
+        color: #0b0f1a; background: linear-gradient(135deg, var(--brand), var(--accent));
+        box-shadow: 0 6px 18px rgba(138,124,251,0.35);
+      }
+      .muted { color: var(--muted); }
+
+      /* Quote wall */
+      .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .quote {
+        background: rgba(255,255,255,0.04);
+        padding: 22px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+        font-weight: 800; font-size: 18px;
+      }
+      @media (max-width: 900px) { .quotes { grid-template-columns: 1fr; } }
+
+      /* Reveal on scroll */
+      .reveal { opacity: 0; transform: translateY(20px); transition: all .6s cubic-bezier(.2, .65, .2, 1); }
+      .reveal.in { opacity: 1; transform: translateY(0); }
+
+      /* Footer CTA */
+      footer { padding: 80px 20px; text-align: center; color: var(--muted); }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-weight: 700; color: #b7c2ff; }
+
+      /* Print tweaks */
+      @media print {
+        header, .orbs, .cta-row, .links { display: none !important; }
+        body { background: #fff; color: #111; }
+        .card, .quote, .item { break-inside: avoid; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="orbs" aria-hidden="true">
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+      <div class="orb three"></div>
+    </div>
+
+    <header>
+      <nav class="nav">
+        <div class="brand"><span class="dot"></span> UNSTOPPABLE</div>
+        <div class="links">
+          <a href="#switch">Switch</a>
+          <a href="#rules">Rules</a>
+          <a href="#protocol">Protocol</a>
+          <a href="#sprint">30-Day</a>
+          <a href="#reps">Reps</a>
+          <a href="#quotes">Quotes</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="section hero">
+        <div class="container">
+          <h1 class="headline">Do the Boring Things<br />Exceptionally Long</h1>
+          <p class="subhead">Greatness isn’t about intensity. It’s about consistency. Repeat the fundamentals until discipline becomes your edge — where character is built and the depth of your desire is tested.</p>
+          <div class="cta-row">
+            <a class="btn primary" href="#sprint">Start the 30‑Day Sprint</a>
+            <button class="btn" onclick="window.print()">Print / Save Manifesto</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- The Big Switch -->
+      <section class="section" id="switch">
+        <div class="container">
+          <div class="kicker">The Big Switch</div>
+          <h2 class="title">Less, but Better. Now, not later.</h2>
+          <div class="grid cols-3">
+            <div class="card reveal">
+              <h3>90% → 100%</h3>
+              <p class="muted">90% feels committed. 100% eliminates decisions. When the rule is non‑negotiable, momentum compounds.</p>
+            </div>
+            <div class="card reveal">
+              <h3>Do Less, But Better</h3>
+              <p class="muted">Ruthlessly subtract. Master the few that matter. Focus is subtraction, not addition.</p>
+            </div>
+            <div class="card reveal">
+              <h3>Obsession Beats Talent</h3>
+              <p class="muted">Talent is rented. Obsession pays the mortgage — every single day.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rules -->
+      <section class="section" id="rules">
+        <div class="container">
+          <div class="kicker">The Rules</div>
+          <h2 class="title">Read them. Live them.</h2>
+          <div class="list">
+            <div class="item reveal"><div class="badge">1</div><div><strong>Do the boring.</strong> Repeat fundamentals until they’re automatic.</div></div>
+            <div class="item reveal"><div class="badge">2</div><div><strong>Focus is subtraction.</strong> Remove everything that isn’t what you said you’d do.</div></div>
+            <div class="item reveal"><div class="badge">3</div><div><strong>Normalize silence.</strong> 20 minutes daily — no music, no phone. Think. Listen.</div></div>
+            <div class="item reveal"><div class="badge">4</div><div><strong>Identity first.</strong> Become the person who does the work. Then do the work.</div></div>
+            <div class="item reveal"><div class="badge">5</div><div><strong>Obsession > talent.</strong> Outlast everyone who’s “gifted.”</div></div>
+            <div class="item reveal"><div class="badge">6</div><div><strong>Pay your dues.</strong> Earn the right to results. Don’t rent them.</div></div>
+            <div class="item reveal"><div class="badge">7</div><div><strong>Be you.</strong> Stay in your lane. Consistency loves authenticity.</div></div>
+            <div class="item reveal"><div class="badge">8</div><div><strong>Serve, connect, create.</strong> Meaning fuels momentum.</div></div>
+            <div class="item reveal"><div class="badge">9</div><div><strong>Chase real dopamine.</strong> Sun. Ice. Weights. Walks. Breath. Vision.</div></div>
+            <div class="item reveal"><div class="badge">10</div><div><strong>All you get is now.</strong> Act before your next excuse arrives.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Protocol -->
+      <section class="section" id="protocol">
+        <div class="container">
+          <div class="kicker">Real Dopamine</div>
+          <h2 class="title">The Protocol</h2>
+          <div class="grid cols-3">
+            <div class="card reveal">
+              <h3>Sun + Ice</h3>
+              <p class="muted">Morning light + cold exposure to reboot your brain and reset your clock.</p>
+            </div>
+            <div class="card reveal">
+              <h3>Weights + Walks</h3>
+              <p class="muted">Build strength. Take long walks. No headphones sometimes — meet your thoughts.</p>
+            </div>
+            <div class="card reveal">
+              <h3>Breath + Vision</h3>
+              <p class="muted">Calm the nervous system. Visualize dull reps compounding into undeniable outcomes.</p>
+            </div>
+            <div class="card reveal">
+              <h3>Serve + Connect</h3>
+              <p class="muted">Contribute daily. You rise fastest when you lift others.</p>
+            </div>
+            <div class="card reveal">
+              <h3>Create Daily</h3>
+              <p class="muted">Ship something small every day. Momentum > perfection.</p>
+            </div>
+            <div class="card reveal">
+              <h3>Subtract</h3>
+              <p class="muted">Audit your inputs. Unfollow noise. Declutter your mind.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 30-Day Sprint -->
+      <section class="section" id="sprint">
+        <div class="container">
+          <div class="kicker">Execution</div>
+          <h2 class="title">30‑Day “Unstoppable” Sprint</h2>
+          <div class="grid cols-2">
+            <div class="card reveal">
+              <h3>Daily</h3>
+              <ul class="muted">
+                <li>20 min silence (no phone, no music)</li>
+                <li>90 min deep work on your One Thing</li>
+                <li>Real dopamine: sun, movement, breath work</li>
+                <li>1 act of service or connection</li>
+                <li>Log your streak (don’t break it)</li>
+              </ul>
+            </div>
+            <div class="card reveal">
+              <h3>Weekly</h3>
+              <ul class="muted">
+                <li>Review: what did you subtract?</li>
+                <li>Raise the floor: make it easier to start than to skip</li>
+                <li>Public checkpoint: share one learn‑note or artifact</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 Boring Reps -->
+      <section class="section" id="reps">
+        <div class="container">
+          <div class="kicker">Compounding</div>
+          <h2 class="title">The 10 Boring Reps That Change Everything</h2>
+          <div class="list">
+            <div class="item reveal"><div class="badge">01</div><div><strong>Show up on time.</strong> Especially when no one’s watching.</div></div>
+            <div class="item reveal"><div class="badge">02</div><div><strong>Plan tomorrow tonight.</strong> Three bullets. Max.</div></div>
+            <div class="item reveal"><div class="badge">03</div><div><strong>Eat the frog first.</strong> Do the hardest thing before noon.</div></div>
+            <div class="item reveal"><div class="badge">04</div><div><strong>Single‑task.</strong> One tab. One task. One outcome.</div></div>
+            <div class="item reveal"><div class="badge">05</div><div><strong>Protect sleep.</strong> Your willpower battery.</div></div>
+            <div class="item reveal"><div class="badge">06</div><div><strong>Daily walk.</strong> Ideas live on the other side of silence.</div></div>
+            <div class="item reveal"><div class="badge">07</div><div><strong>Lift 3×/week.</strong> Strong body. Strong mind.</div></div>
+            <div class="item reveal"><div class="badge">08</div><div><strong>Write 200 words/day.</strong> Clarity compounding.</div></div>
+            <div class="item reveal"><div class="badge">09</div><div><strong>Audit inputs.</strong> Unfollow noise. Unsubscribe junk.</div></div>
+            <div class="item reveal"><div class="badge">10</div><div><strong>Close the loop.</strong> Finish what you start.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quotes -->
+      <section class="section" id="quotes">
+        <div class="container">
+          <div class="kicker">Quote Wall</div>
+          <h2 class="title">Pin these to your mind</h2>
+          <div class="quotes">
+            <div class="quote reveal">Discipline is your edge.</div>
+            <div class="quote reveal">Less, but better.</div>
+            <div class="quote reveal">Obsession beats talent.</div>
+            <div class="quote reveal">Normalize silence.</div>
+            <div class="quote reveal">All you get is now.</div>
+            <div class="quote reveal">Do the boring, for an exceptionally long time.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>Start before you’re ready. <span class="mono">now()</span></p>
+      </div>
+    </footer>
+
+    <script>
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          const id = a.getAttribute('href');
+          const el = document.querySelector(id);
+          if (!el) return;
+          e.preventDefault();
+          const y = el.getBoundingClientRect().top + window.scrollY - 70;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        });
+      });
+
+      // Reveal on scroll
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            io.unobserve(entry.target);
+          }
+        }
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    </script>
+  </body>
+  </html>
+
+

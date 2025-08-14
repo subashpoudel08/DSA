@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Binary Trees — Structured Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22d3ee;
+      --accent-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      overflow-y: overlay;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px 40px;
+    }
+    .sidebar {
+      position: sticky; top: 20px; align-self: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+    }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a { display: block; text-decoration: none; color: var(--text); padding: 8px 10px; border-radius: 10px; transition: all .15s ease; border: 1px solid transparent; }
+    .toc a:hover { background: #0b1220; border-color: var(--border); color: #ffffff; }
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .hero { position: relative; background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06)); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .hero:after { content: ""; position: absolute; top: -40px; right: -60px; width: 220px; height: 220px; background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%); filter: blur(6px); pointer-events: none; }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+    section.card { background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 18px; box-shadow: var(--shadow); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .note { color: var(--muted); font-size: 14px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: #0b1220; border: 1px solid var(--border); color: var(--text); font-size: 13px; }
+    .pill b { color: var(--accent); }
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe; border-bottom: 1px solid var(--border); user-select: none; }
+    summary::-webkit-details-marker { display:none; }
+    .details-body { padding: 12px 14px; color: var(--text); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; color: #c7d2fe; font-weight: 600; background: rgba(167,139,250,0.08); }
+    tr:last-child td { border-bottom: none; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+    .callout { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02)); padding: 10px 12px; border-radius: 10px; margin: 10px 0; }
+    .formula { background: #0b1220; border: 1px dashed #1f334d; padding: 10px 12px; border-radius: 10px; }
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+    @media (max-width: 960px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } }
+
+    /* Quiz helpers */
+    .quiz { display: grid; gap: 12px; }
+    .quiz .q { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; padding: 12px; }
+    .quiz .choice { display: block; margin: 6px 0; }
+    .quiz .ans { display: none; margin-top: 8px; color: var(--ok); }
+    .quiz .reveal { margin-top: 8px; }
+    .quiz button { background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+    .quiz button:hover { border-color: var(--accent); color: #ffffff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#example">Core Concepts & Examples</a></li>
+        <li><a href="#brute">Types of Binary Trees</a></li>
+        <li><a href="#two-pass">Height, Balance & Properties</a></li>
+        <li><a href="#single-pass">Traversal Techniques</a></li>
+        <li><a href="#dry-run">Worked Example</a></li>
+        <li><a href="#pseudocode">Implementations (C++ & Java)</a></li>
+        <li><a href="#conclusion">Conclusion + Quiz</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">Binary Trees — Introduction & Types</h1>
+        <p class="subtitle">A practical overview of binary trees: terminology, common types (full, complete, perfect, balanced, degenerate), and fundamental traversals.</p>
+        <div class="chips">
+          <span class="chip">Binary Trees</span>
+          <span class="chip">Data Structures</span>
+          <span class="chip">Traversal</span>
+          <span class="chip">O(log N)</span>
+          <span class="chip">Hierarchy</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="pill"><b>Reading time:</b> ~11 min</span>
+          <span class="pill"><b>Keywords:</b> binary tree, root, child, leaf, subtree, full, complete, perfect, balanced, degenerate, traversal</span>
+        </div>
+      </header>
+
+      <section id="intro" class="card">
+        <h2>Introduction</h2>
+        <p>A binary tree is a hierarchical data structure in which each node has at most two children (commonly referred to as the left child and the right child). Unlike arrays, stacks, and queues—which are linear—trees capture parent–child relationships and naturally model hierarchies such as file systems.</p>
+
+        <h3>Summary</h3>
+        <ul>
+          <li>Each node has at most two children: left and right.</li>
+          <li>Key terms: root, children, leaf, subtree, ancestor/descendant, level, height.</li>
+          <li>Common types: full, complete, perfect, balanced, and degenerate (skewed).</li>
+          <li>Balanced trees enable operations with height ≈ O(log N).</li>
+          <li>Core traversals: preorder, inorder, postorder, and level-order (BFS).</li>
+        </ul>
+      </section>
+
+      <section id="example" class="card">
+        <h2>Core Concepts & Examples</h2>
+        <ul>
+          <li><b>Root:</b> The unique topmost node, from which the tree originates.</li>
+          <li><b>Children:</b> Nodes directly connected below a node; a node can have 0, 1, or 2 children.</li>
+          <li><b>Leaf:</b> A node with no children.</li>
+          <li><b>Subtree:</b> Any node together with all of its descendants.</li>
+          <li><b>Ancestors/Descendants:</b> On the path upward/downward from a node respectively.</li>
+          <li><b>Level (Depth):</b> Distance in edges from the root (root at level 0).</li>
+          <li><b>Height:</b> Longest downward path from a node to a leaf (height of a leaf is 0).</li>
+        </ul>
+        <div class="callout">Thinking in hierarchies helps: a folder contains subfolders and files; similarly, a node contains subtrees and leaves.</div>
+      </section>
+
+      <section id="brute" class="card">
+        <h2>Types of Binary Trees</h2>
+        <ul>
+          <li><b>Full Binary Tree:</b> Every node has either 0 or 2 children (no node has exactly one child).</li>
+          <li><b>Complete Binary Tree:</b> All levels are completely filled except possibly the last, and the last level’s nodes are as far left as possible.</li>
+          <li><b>Perfect Binary Tree:</b> All leaf nodes are at the same level; equivalently, every internal node has exactly 2 children and every level is full.</li>
+          <li><b>Balanced Binary Tree:</b> Height grows on the order of O(log N). Many implementations enforce a small height difference between subtrees (e.g., AVL, Red–Black).</li>
+          <li><b>Degenerate (Skewed) Tree:</b> Every node has only one child, producing a structure like a linked list.</li>
+        </ul>
+      </section>
+
+      <section id="two-pass" class="card">
+        <h2>Height, Balance & Properties</h2>
+        <ul>
+          <li><b>Height bounds:</b> For N nodes, 0 ≤ height ≤ N−1; balanced trees aim near log₂(N).</li>
+          <li><b>Perfect tree size:</b> For height h, total nodes N = 2^(h+1) − 1 and leaves L = 2^h.</li>
+          <li><b>Why balance matters:</b> Search/insert/delete on trees like BSTs benefit from logarithmic height.</li>
+          <li><b>Completeness vs Perfectness:</b> Every perfect tree is complete; not every complete tree is perfect.</li>
+          <li><b>Skew impact:</b> Degenerate trees behave like linked lists with O(N) height.</li>
+        </ul>
+        <div class="formula"><code>N = 2^{h+1} - 1</code>, <code>L = 2^{h}</code> for a perfect tree of height <code>h</code>.</div>
+      </section>
+
+      <section id="single-pass" class="card">
+        <h2>Traversal Techniques</h2>
+        <ul>
+          <li><b>Preorder (Root, Left, Right):</b> Visits root before subtrees; useful for copying or serializing a tree.</li>
+          <li><b>Inorder (Left, Root, Right):</b> Yields sorted order on Binary Search Trees.</li>
+          <li><b>Postorder (Left, Right, Root):</b> Frees subtrees before the root; useful for deletion and computing subtree properties.</li>
+          <li><b>Level-order (BFS):</b> Visits nodes level by level; helpful for completeness checks and shortest path in unweighted trees.</li>
+        </ul>
+        <p class="note">Recursive definitions are concise and readable; iterative variants with stacks/queues are common for large trees to avoid deep recursion.</p>
+      </section>
+
+      <section id="dry-run" class="card">
+        <h2>Worked Example</h2>
+        <p>Consider the tree with root 1, children 2 and 3; node 2 has children 4 and 5; node 3 has a single left child 6.</p>
+        <div class="details-body">
+          <ul>
+            <li>Preorder: 1, 2, 4, 5, 3, 6</li>
+            <li>Inorder: 4, 2, 5, 1, 6, 3</li>
+            <li>Postorder: 4, 5, 2, 6, 3, 1</li>
+            <li>Level-order: 1 | 2, 3 | 4, 5, 6</li>
+            <li>Type checks: not full (node 3 has one child), not perfect (leaves at different levels), not balanced if height is large relative to N; completeness depends on level-order positioning.</li>
+          </ul>
+        </div>
+        <div class="callout"><b>Tip:</b> To check completeness, ensure no node appears on the right when a left position is missing at the last level.</div>
+      </section>
+
+      <section id="pseudocode" class="card">
+        <h2>Implementations (C++ & Java)</h2>
+        <h3>C++: Node definition and traversals</h3>
+        <pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+void preorder(TreeNode* root, vector&lt;int&gt;&amp; out) {
+    if (!root) return;
+    out.push_back(root-&gt;val);
+    preorder(root-&gt;left, out);
+    preorder(root-&gt;right, out);
+}
+
+void inorder(TreeNode* root, vector&lt;int&gt;&amp; out) {
+    if (!root) return;
+    inorder(root-&gt;left, out);
+    out.push_back(root-&gt;val);
+    inorder(root-&gt;right, out);
+}
+
+void postorder(TreeNode* root, vector&lt;int&gt;&amp; out) {
+    if (!root) return;
+    postorder(root-&gt;left, out);
+    postorder(root-&gt;right, out);
+    out.push_back(root-&gt;val);
+}
+
+vector&lt;int&gt; levelOrder(TreeNode* root) {
+    vector&lt;int&gt; out; if (!root) return out;
+    queue&lt;TreeNode*&gt; q; q.push(root);
+    while (!q.empty()) {
+        auto* node = q.front(); q.pop();
+        out.push_back(node-&gt;val);
+        if (node-&gt;left) q.push(node-&gt;left);
+        if (node-&gt;right) q.push(node-&gt;right);
+    }
+    return out;
+}
+
+// Check if full: every node has 0 or 2 children
+bool isFull(TreeNode* root) {
+    if (!root) return true;
+    bool hasLeft = root-&gt;left != nullptr, hasRight = root-&gt;right != nullptr;
+    if (hasLeft != hasRight) return false;
+    return isFull(root-&gt;left) &amp;&amp; isFull(root-&gt;right);
+}
+
+// Check completeness via BFS
+bool isComplete(TreeNode* root) {
+    if (!root) return true;
+    queue&lt;TreeNode*&gt; q; q.push(root);
+    bool seenNull = false;
+    while (!q.empty()) {
+        TreeNode* cur = q.front(); q.pop();
+        if (!cur) { seenNull = true; continue; }
+        if (seenNull) return false; // non-null after null in level-order
+        q.push(cur-&gt;left);
+        q.push(cur-&gt;right);
+    }
+    return true;
+}
+
+// Height (edges). Returns -1 for null so leaf has height 0
+int height(TreeNode* root) {
+    if (!root) return -1;
+    return 1 + max(height(root-&gt;left), height(root-&gt;right));
+}
+
+// Balanced if for every node the subtree heights differ by at most 1
+pair&lt;bool,int&gt; checkBalanced(TreeNode* root) {
+    if (!root) return {true, -1};
+    auto [lb, lh] = checkBalanced(root-&gt;left);
+    auto [rb, rh] = checkBalanced(root-&gt;right);
+    bool ok = lb &amp;&amp; rb &amp;&amp; abs(lh - rh) &lt;= 1;
+    return {ok, 1 + max(lh, rh)};
+}
+
+bool isPerfect(TreeNode* root) {
+    if (!root) return true;
+    int h = height(root);
+    // Perfect iff all leaves at same depth and all internal nodes have 2 children
+    function&lt;bool(TreeNode*, int)&gt; dfs = [&](TreeNode* node, int depth) {
+        if (!node) return true;
+        if (!node-&gt;left &amp;&amp; !node-&gt;right) return depth == h;
+        if (!node-&gt;left || !node-&gt;right) return false;
+        return dfs(node-&gt;left, depth + 1) &amp;&amp; dfs(node-&gt;right, depth + 1);
+    };
+    return dfs(root, 0);
+}
+</code></pre>
+
+        <h3>Java: Node definition and traversals</h3>
+        <pre><code class="language-java">import java.util.*;
+
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
+class BinaryTreeUtils {
+    static void preorder(TreeNode root, List&lt;Integer&gt; out) {
+        if (root == null) return;
+        out.add(root.val);
+        preorder(root.left, out);
+        preorder(root.right, out);
+    }
+
+    static void inorder(TreeNode root, List&lt;Integer&gt; out) {
+        if (root == null) return;
+        inorder(root.left, out);
+        out.add(root.val);
+        inorder(root.right, out);
+    }
+
+    static void postorder(TreeNode root, List&lt;Integer&gt; out) {
+        if (root == null) return;
+        postorder(root.left, out);
+        postorder(root.right, out);
+        out.add(root.val);
+    }
+
+    static List&lt;Integer&gt; levelOrder(TreeNode root) {
+        List&lt;Integer&gt; out = new ArrayList&lt;&gt;();
+        if (root == null) return out;
+        Queue&lt;TreeNode&gt; q = new ArrayDeque&lt;&gt;();
+        q.offer(root);
+        while (!q.isEmpty()) {
+            TreeNode node = q.poll();
+            out.add(node.val);
+            if (node.left != null) q.offer(node.left);
+            if (node.right != null) q.offer(node.right);
+        }
+        return out;
+    }
+
+    static boolean isFull(TreeNode root) {
+        if (root == null) return true;
+        boolean hasLeft = root.left != null, hasRight = root.right != null;
+        if (hasLeft ^ hasRight) return false;
+        return isFull(root.left) &amp;&amp; isFull(root.right);
+    }
+
+    static boolean isComplete(TreeNode root) {
+        if (root == null) return true;
+        Queue&lt;TreeNode&gt; q = new ArrayDeque&lt;&gt;();
+        q.offer(root);
+        boolean seenNull = false;
+        while (!q.isEmpty()) {
+            TreeNode cur = q.poll();
+            if (cur == null) { seenNull = true; continue; }
+            if (seenNull) return false;
+            q.offer(cur.left);
+            q.offer(cur.right);
+        }
+        return true;
+    }
+
+    static int height(TreeNode root) {
+        if (root == null) return -1;
+        return 1 + Math.max(height(root.left), height(root.right));
+    }
+
+    static class Pair { boolean ok; int h; Pair(boolean o, int hh){ ok=o; h=hh; } }
+
+    static Pair checkBalanced(TreeNode root) {
+        if (root == null) return new Pair(true, -1);
+        Pair L = checkBalanced(root.left);
+        Pair R = checkBalanced(root.right);
+        boolean ok = L.ok &amp;&amp; R.ok &amp;&amp; Math.abs(L.h - R.h) &lt;= 1;
+        return new Pair(ok, 1 + Math.max(L.h, R.h));
+    }
+
+    static boolean isPerfect(TreeNode root) {
+        int h = height(root);
+        return isPerfectAtDepth(root, 0, h);
+    }
+
+    private static boolean isPerfectAtDepth(TreeNode node, int depth, int h) {
+        if (node == null) return true;
+        if (node.left == null &amp;&amp; node.right == null) return depth == h;
+        if (node.left == null || node.right == null) return false;
+        return isPerfectAtDepth(node.left, depth + 1, h) &amp;&amp; isPerfectAtDepth(node.right, depth + 1, h);
+    }
+}
+</code></pre>
+
+        <h3>Complexity</h3>
+        <ul>
+          <li><b>Traversals:</b> Visit each node once ⇒ O(N) time, O(H) stack space (recursion) or O(N) with explicit queue for BFS.</li>
+          <li><b>Checks (full, complete, perfect, balanced):</b> O(N) time using DFS/BFS; O(H) auxiliary space.</li>
+        </ul>
+      </section>
+
+      <section id="conclusion" class="card">
+        <h2>Conclusion</h2>
+        <ul>
+          <li>Binary trees model hierarchical data with at most two children per node.</li>
+          <li>Recognize key types and their invariants: full, complete, perfect, balanced, degenerate.</li>
+          <li>Efficient traversals and property checks run in O(N) time.</li>
+          <li>Balanced height enables near-logarithmic operation costs in tree-based structures.</li>
+        </ul>
+
+        <h3>Interactive Quiz</h3>
+        <div class="quiz" id="quiz">
+          <!-- Q1 MCQ -->
+          <div class="q">
+            <div><b>1) Which statement best defines a binary tree?</b></div>
+            <label class="choice"><input type="radio" name="q1"> A tree where each node has at most three children</label>
+            <label class="choice"><input type="radio" name="q1"> A hierarchical structure where each node has at most two children</label>
+            <label class="choice"><input type="radio" name="q1"> A linear list of nodes</label>
+            <label class="choice"><input type="radio" name="q1"> A graph with cycles</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">A hierarchical structure where each node has at most two children.</div></details>
+          </div>
+
+          <!-- Q2 MCQ -->
+          <div class="q">
+            <div><b>2) In a full binary tree, each node has:</b></div>
+            <label class="choice"><input type="radio" name="q2"> Either 0 or 2 children</label>
+            <label class="choice"><input type="radio" name="q2"> At least 1 child</label>
+            <label class="choice"><input type="radio" name="q2"> At most 1 child</label>
+            <label class="choice"><input type="radio" name="q2"> Exactly 2 children</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">Either 0 or 2 children.</div></details>
+          </div>
+
+          <!-- Q3 SA -->
+          <div class="q">
+            <div><b>3) Short answer:</b> In a perfect binary tree of height h, how many nodes are there?</div>
+            <button data-target="a3">Reveal answer</button>
+            <div id="a3" class="ans">2^(h+1) - 1</div>
+          </div>
+
+          <!-- Q4 MCQ -->
+          <div class="q">
+            <div><b>4) Which property distinguishes a complete binary tree?</b></div>
+            <label class="choice"><input type="radio" name="q4"> All leaves at the same level</label>
+            <label class="choice"><input type="radio" name="q4"> All levels filled except possibly last; nodes as far left as possible</label>
+            <label class="choice"><input type="radio" name="q4"> Every node has exactly two children</label>
+            <label class="choice"><input type="radio" name="q4"> The height is exactly log₂(N)</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">All levels filled except possibly last; nodes as far left as possible.</div></details>
+          </div>
+
+          <!-- Q5 SA -->
+          <div class="q">
+            <div><b>5) Short answer:</b> List the four primary depth-first traversals discussed.</div>
+            <button data-target="a5">Reveal answer</button>
+            <div id="a5" class="ans">Preorder, Inorder, Postorder, and (breadth-first) Level-order was also covered separately.</div>
+          </div>
+
+          <!-- Q6 MCQ -->
+          <div class="q">
+            <div><b>6) Why are balanced trees desirable?</b></div>
+            <label class="choice"><input type="radio" name="q6"> They guarantee O(1) time for all operations</label>
+            <label class="choice"><input type="radio" name="q6"> They minimize memory usage</label>
+            <label class="choice"><input type="radio" name="q6"> They keep height near O(log N), improving operation times</label>
+            <label class="choice"><input type="radio" name="q6"> They avoid recursion</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">They keep height near O(log N), improving operation times.</div></details>
+          </div>
+
+          <!-- Q7 SA -->
+          <div class="q">
+            <div><b>7) Short answer:</b> What traversal yields sorted output for a Binary Search Tree?</div>
+            <button data-target="a7">Reveal answer</button>
+            <div id="a7" class="ans">Inorder traversal.</div>
+          </div>
+
+          <!-- Q8 MCQ -->
+          <div class="q">
+            <div><b>8) Which condition breaks completeness during level-order traversal?</b></div>
+            <label class="choice"><input type="radio" name="q8"> Encountering a leaf</label>
+            <label class="choice"><input type="radio" name="q8"> Seeing a non-null node after a null position</label>
+            <label class="choice"><input type="radio" name="q8"> Visiting the right child before the left</label>
+            <label class="choice"><input type="radio" name="q8"> Having different leaf depths</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">Seeing a non-null node after a null position.</div></details>
+          </div>
+
+          <!-- Q9 SA -->
+          <div class="q">
+            <div><b>9) Short answer:</b> Define a degenerate (skewed) tree in one sentence.</div>
+            <button data-target="a9">Reveal answer</button>
+            <div id="a9" class="ans">A tree in which each node has only one child, forming a list-like chain.</div>
+          </div>
+
+          <!-- Q10 MCQ -->
+          <div class="q">
+            <div><b>10) Which traversal is naturally implemented with a queue?</b></div>
+            <label class="choice"><input type="radio" name="q10"> Preorder</label>
+            <label class="choice"><input type="radio" name="q10"> Inorder</label>
+            <label class="choice"><input type="radio" name="q10"> Postorder</label>
+            <label class="choice"><input type="radio" name="q10"> Level-order</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">Level-order (BFS).</div></details>
+          </div>
+
+          <!-- Q11 SA -->
+          <div class="q">
+            <div><b>11) Short answer:</b> Give one criterion that makes a tree not full.</div>
+            <button data-target="a11">Reveal answer</button>
+            <div id="a11" class="ans">A node exists with exactly one child.</div>
+          </div>
+
+          <!-- Q12 MCQ -->
+          <div class="q">
+            <div><b>12) In a perfect tree, all leaves are:</b></div>
+            <label class="choice"><input type="radio" name="q12"> At potentially different levels</label>
+            <label class="choice"><input type="radio" name="q12"> At the same level</label>
+            <label class="choice"><input type="radio" name="q12"> Absent</label>
+            <label class="choice"><input type="radio" name="q12"> On the right-most side only</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">At the same level.</div></details>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer-note">Optimized for quick revision. 🚀</div>
+    </main>
+  </div>
+
+  <script>
+    // Simple toggle for short-answer reveal buttons
+    (function () {
+      document.querySelectorAll('.quiz button[data-target]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var id = btn.getAttribute('data-target');
+          var ans = document.getElementById(id);
+          if (!ans) return;
+          var visible = ans.style.display === 'block';
+          ans.style.display = visible ? 'none' : 'block';
+          btn.textContent = visible ? 'Reveal answer' : 'Hide answer';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
+
