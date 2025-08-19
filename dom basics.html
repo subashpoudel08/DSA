@@ -1,0 +1,543 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JavaScript DOM Targeting Methods — Structured Notes</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #22d3ee;
+      --accent-2: #a78bfa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --danger: #fb7185;
+      --code-bg: #0b1020;
+      --border: #1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,0.45);
+      --radius: 14px;
+      --hl: rgba(34,211,238,0.2);
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 80% -50%, #18263a 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+      overflow-y: overlay;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px 40px;
+    }
+    .sidebar {
+      position: sticky; top: 20px; align-self: start;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+    }
+    .sidebar h3 { margin: 0 0 10px; font-size: 16px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { margin: 6px 0; }
+    .toc a { display: block; text-decoration: none; color: var(--text); padding: 8px 10px; border-radius: 10px; transition: all .15s ease; border: 1px solid transparent; }
+    .toc a:hover { background: #0b1220; border-color: var(--border); color: #ffffff; }
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .hero { position: relative; background: linear-gradient(180deg, rgba(167,139,250,0.10), rgba(34,211,238,0.06)); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow); overflow: hidden; }
+    .hero:after { content: ""; position: absolute; top: -40px; right: -60px; width: 220px; height: 220px; background: radial-gradient(120px 120px at 60% 40%, rgba(34,211,238,.35), rgba(34,211,238,0) 70%); filter: blur(6px); pointer-events: none; }
+    .title { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { padding: 4px 8px; border: 1px solid var(--border); background: #0b1220; border-radius: 999px; color: var(--muted); font-size: 12px; }
+    section.card { background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015)); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 18px; box-shadow: var(--shadow); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 16px 0 8px; font-size: 16px; color: var(--accent-2); }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .note { color: var(--muted); font-size: 14px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: #0b1220; border: 1px solid var(--border); color: var(--text); font-size: 13px; }
+    .pill b { color: var(--accent); }
+    details { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; }
+    summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 600; color: #dbeafe; border-bottom: 1px solid var(--border); user-select: none; }
+    summary::-webkit-details-marker { display:none; }
+    .details-body { padding: 12px 14px; color: var(--text); }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; color: #c7d2fe; font-weight: 600; background: rgba(167,139,250,0.08); }
+    tr:last-child td { border-bottom: none; }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
+    code { background: rgba(255,255,255,0.03); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border); color: #e2e8f0; }
+    .callout { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(34,211,238,0.07), rgba(34,211,238,0.02)); padding: 10px 12px; border-radius: 10px; margin: 10px 0; }
+    .formula { background: #0b1220; border: 1px dashed #1f334d; padding: 10px 12px; border-radius: 10px; }
+    .footer-note { color: var(--muted); font-size: 13px; text-align: center; margin-top: 10px; }
+    @media (max-width: 960px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; order: -1; } }
+
+    /* Quiz helpers */
+    .quiz { display: grid; gap: 12px; }
+    .quiz .q { border: 1px solid var(--border); border-radius: 12px; background: #0b1220; padding: 12px; }
+    .quiz .choice { display: block; margin: 6px 0; }
+    .quiz .ans { display: none; margin-top: 8px; color: var(--ok); }
+    .quiz .reveal { margin-top: 8px; }
+    .quiz button { background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+    .quiz button:hover { border-color: var(--accent); color: #ffffff; }
+
+    /* Diagram */
+    .diagram { display: grid; gap: 8px; }
+    .diagram .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .node {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      position: relative;
+    }
+    .node small { color: var(--muted); display: block; font-size: 11px; }
+    .node.hl { outline: 2px solid var(--accent); background: var(--hl); }
+    .diagram-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .diagram-controls button {
+      background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer;
+    }
+    .diagram-controls button:hover { border-color: var(--accent); color: #ffffff; }
+    .diagram .cmd { margin-top: 8px; color: var(--muted); font-size: 13px; }
+
+    /* Mobile-focused enhancements */
+    @media (max-width: 640px) {
+      .hero { padding: 20px 16px; }
+      .title { font-size: 22px; line-height: 1.25; }
+      .subtitle { font-size: 14px; }
+      .chip { font-size: 11px; padding: 3px 6px; }
+      .pill { font-size: 12px; padding: 6px 10px; }
+      section.card { padding: 16px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      pre { font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+      code { font-size: 12px; }
+      table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      th, td { white-space: nowrap; }
+      .toc a { padding: 10px 12px; }
+      .diagram .row { gap: 6px; }
+      .diagram-controls button, .quiz button { padding: 10px 12px; font-size: 14px; }
+      ul { margin-left: 16px; }
+      .container { padding-bottom: 56px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>On this page</h3>
+      <ul class="toc">
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#example">Visualization & Examples</a></li>
+        <li><a href="#brute">Core Document Targets</a></li>
+        <li><a href="#two-pass">Choosing a Method</a></li>
+        <li><a href="#single-pass">Syntax & Patterns</a></li>
+        <li><a href="#dry-run">Console Walkthrough</a></li>
+        <li><a href="#pseudocode">Cheat Sheet & Reference</a></li>
+        <li><a href="#conclusion">Conclusion + Quiz</a></li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <h1 class="title">JavaScript DOM Targeting Methods | Target by Id, Class, Tag</h1>
+        <p class="subtitle">How to reliably locate specific elements in the Document Object Model to inspect or manipulate them.</p>
+        <div class="chips">
+          <span class="chip">DOM</span>
+          <span class="chip">Selectors</span>
+          <span class="chip">HTMLCollection</span>
+          <span class="chip">document</span>
+          <span class="chip">Beginner</span>
+          <span class="chip">Console</span>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="pill"><b>Reading time:</b> ~10 min</span>
+          <span class="pill"><b>Keywords:</b> DOM, getElementById, getElementsByClassName, getElementsByTagName, document, HTMLCollection</span>
+        </div>
+      </header>
+
+      <section id="intro" class="card">
+        <h2>Introduction</h2>
+        <p>The HTML DOM represents a page as a tree of nodes (elements, attributes, and text). JavaScript can target any node to read or change it. When pages contain multiple similar elements, you need precise methods to select the right one.</p>
+
+        <h3>Summary</h3>
+        <ul>
+          <li><b>Three primary methods:</b> <code>document.getElementById(id)</code>, <code>document.getElementsByClassName(name)</code>, <code>document.getElementsByTagName(name)</code>.</li>
+          <li><b>By Id</b> returns a single element (or <code>null</code>) because an id should be unique.</li>
+          <li><b>By Class/Tag</b> returns an <code>HTMLCollection</code> (array‑like) of matching elements; access with indices.</li>
+          <li><b>document</b> exposes useful entry points like <code>head</code>, <code>title</code>, <code>body</code>, <code>links</code>, <code>images</code>, and more.</li>
+          <li>Pass ids, class names, or tag names as <b>strings</b>; do not prefix ids with <code>#</code> or classes with <code>.</code> in these methods.</li>
+        </ul>
+      </section>
+
+      <section id="example" class="card">
+        <h2>Visualization & Examples</h2>
+        <p>This diagram illustrates a simple DOM tree. Use the buttons to highlight which nodes are targeted by each method and see the corresponding command.</p>
+
+        <div class="diagram" id="dom-diagram">
+          <div class="row">
+            <div class="node" data-key="html">&lt;html&gt;<small>document.documentElement</small></div>
+          </div>
+          <div class="row">
+            <div class="node" data-key="head">&lt;head&gt;<small>document.head</small></div>
+            <div class="node" data-key="body">&lt;body&gt;<small>document.body</small></div>
+          </div>
+          <div class="row">
+            <div class="node" data-key="title">&lt;title&gt;<small>document.title</small></div>
+            <div class="node" data-key="header" data-id="header">&lt;header id="header"&gt;<small>id="header"</small></div>
+            <div class="node" data-key="nav">&lt;nav&gt;</div>
+            <div class="node" data-key="main">&lt;main&gt;</div>
+            <div class="node" data-key="ul1" data-class="list">&lt;ul class="list"&gt;</div>
+            <div class="node" data-key="p1" data-class="list">&lt;p class="list"&gt;</div>
+            <div class="node" data-key="footer">&lt;footer&gt;</div>
+          </div>
+          <div class="diagram-controls">
+            <button data-demo="byId">document.getElementById("header")</button>
+            <button data-demo="byClass">document.getElementsByClassName("list")</button>
+            <button data-demo="byTagUl">document.getElementsByTagName("ul")</button>
+            <button data-demo="clear">Clear highlight</button>
+          </div>
+          <div class="cmd" id="diagram-cmd">Command: —</div>
+        </div>
+
+        <div class="callout">Tip: When you receive an <code>HTMLCollection</code>, use an index like <code>[0]</code> to access a specific element.</div>
+      </section>
+
+      <section id="brute" class="card">
+        <h2>Core Document Targets</h2>
+        <p>Beyond id/class/tag methods, the <code>document</code> object provides direct access to common parts of the page.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Property / Collection</th>
+              <th>What it represents</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>document</code></td><td>The root DOM object for the current page.</td></tr>
+            <tr><td><code>document.all</code></td><td>Array‑like collection of all elements in document order.</td></tr>
+            <tr><td><code>document.documentElement</code></td><td>The <code>&lt;html&gt;</code> element.</td></tr>
+            <tr><td><code>document.head</code></td><td>The <code>&lt;head&gt;</code> element and its contents.</td></tr>
+            <tr><td><code>document.title</code></td><td>The text inside <code>&lt;title&gt;</code>.</td></tr>
+            <tr><td><code>document.body</code></td><td>The <code>&lt;body&gt;</code> element.</td></tr>
+            <tr><td><code>document.images</code></td><td>Collection of all <code>&lt;img&gt;</code> elements.</td></tr>
+            <tr><td><code>document.anchors</code></td><td>Anchors with a <code>name</code> attribute (legacy).</td></tr>
+            <tr><td><code>document.links</code></td><td>All <code>&lt;a&gt;</code> elements that have an <code>href</code>.</td></tr>
+            <tr><td><code>document.forms</code></td><td>All <code>&lt;form&gt;</code> elements.</td></tr>
+            <tr><td><code>document.doctype</code></td><td>The document’s doctype declaration.</td></tr>
+            <tr><td><code>document.URL</code></td><td>The full URL of the current document.</td></tr>
+            <tr><td><code>document.baseURI</code></td><td>The document’s base URL used for resolving relative URLs.</td></tr>
+            <tr><td><code>document.domain</code></td><td>The document’s domain.</td></tr>
+          </tbody>
+        </table>
+        <p class="note">Collections like <code>images</code>, <code>links</code>, and <code>forms</code> are array‑like; use indexes or convert to arrays to iterate.</p>
+      </section>
+
+      <section id="two-pass" class="card">
+        <h2>Choosing a Method</h2>
+        <p>Select the targeting approach that matches your intent:</p>
+        <ul>
+          <li><b>Use Id</b> for a single, unique element. Returns the element or <code>null</code>.</li>
+          <li><b>Use Class</b> when multiple elements share the same role or style. Returns an <code>HTMLCollection</code>.</li>
+          <li><b>Use Tag</b> to fetch all elements of a type (e.g., all <code>li</code> or <code>ul</code>). Returns an <code>HTMLCollection</code>.</li>
+          <li><b>Use document.* properties</b> for quick access to global parts like <code>head</code>, <code>body</code>, <code>links</code>, or <code>images</code>.</li>
+        </ul>
+        <div class="callout">Arguments are plain strings. Do not prefix with <code>#</code> for ids or <code>.</code> for classes in these methods.</div>
+      </section>
+
+      <section id="single-pass" class="card">
+        <h2>Syntax & Patterns</h2>
+        <div class="grid-2">
+          <div>
+            <h3>Target by Id</h3>
+            <pre><code class="language-js">const el = document.getElementById("header");
+// el is the single element with id="header" or null if not found</code></pre>
+
+            <h3>Target by Class Name</h3>
+            <pre><code class="language-js">const items = document.getElementsByClassName("list");
+// items is an HTMLCollection (array-like)
+const firstItem = items[0];</code></pre>
+          </div>
+          <div>
+            <h3>Target by Tag Name</h3>
+            <pre><code class="language-js">const uls = document.getElementsByTagName("ul");
+// Get the third &lt;ul&gt; if it exists
+const thirdUl = uls[2];</code></pre>
+
+            <h3>Work with HTMLCollection</h3>
+            <pre><code class="language-js">// Option 1: traditional for loop
+const links = document.links;
+for (let i = 0; i &lt; links.length; i++) {
+  console.log(links[i].href);
+}
+
+// Option 2: convert to Array to use array helpers
+Array.from(document.images).forEach(img =&gt; console.log(img.src));</code></pre>
+          </div>
+        </div>
+        <p class="note">If you expect a single element and your selection returns a collection, pick an index like <code>[0]</code> or filter after converting to an array.</p>
+      </section>
+
+      <section id="dry-run" class="card">
+        <h2>Console Walkthrough</h2>
+        <p>Try these lines in the browser console to inspect core parts of the page and target elements:</p>
+        <ul>
+          <li><code>element = document;</code> → the entire document object.</li>
+          <li><code>element = document.all;</code> → an <code>HTMLAllCollection</code> of all tags; e.g., <code>document.all[9]</code> targets the 10th element.</li>
+          <li><code>element = document.head;</code> → the <code>&lt;head&gt;</code> element.</li>
+          <li><code>element = document.title;</code> → the string value of <code>&lt;title&gt;</code>.</li>
+          <li><code>element = document.body;</code> → the <code>&lt;body&gt;</code> element.</li>
+          <li><code>element = document.links;</code> → collection of <code>&lt;a&gt;</code> with <code>href</code>; e.g., <code>document.links[0]</code>.</li>
+          <li><code>element = document.images;</code> → collection of all <code>&lt;img&gt;</code> elements.</li>
+          <li><code>element = document.doctype;</code> → the doctype declaration.</li>
+          <li><code>element = document.URL;</code> → the current page URL.</li>
+          <li><code>element = document.domain;</code> → the current domain.</li>
+          <li><code>element = document.baseURI;</code> → the base URL of the document.</li>
+        </ul>
+        <h3>By Id</h3>
+        <pre><code class="language-js">const element = document.getElementById("header");</code></pre>
+        <p>Targets the element with <code>id="header"</code>. The argument is just the id name as a string.</p>
+
+        <h3>By Class Name</h3>
+        <pre><code class="language-js">const elements = document.getElementsByClassName("list");
+const first = elements[0];</code></pre>
+        <p>Returns a collection. Index into it to select a specific element.</p>
+
+        <h3>By Tag Name</h3>
+        <pre><code class="language-js">const lists = document.getElementsByTagName("ul");
+const third = lists[2]; // third &lt;ul&gt; if present</code></pre>
+      </section>
+
+      <section id="pseudocode" class="card">
+        <h2>Cheat Sheet & Reference</h2>
+        <pre><code class="language-text">Target by Id:
+element = document.getElementById("idName")
+
+Target by Class Name (collection):
+elements = document.getElementsByClassName("className")
+first = elements[0]
+
+Target by Tag Name (collection):
+elements = document.getElementsByTagName("tagName")
+nth = elements[i]
+
+Read document parts:
+head = document.head
+titleText = document.title
+bodyEl = document.body
+links = document.links
+images = document.images
+url = document.URL
+domain = document.domain
+base = document.baseURI
+</code></pre>
+
+        <h3>Quick Reference</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Method / Property</th>
+              <th>Argument</th>
+              <th>Returns</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>document.getElementById</code></td><td><code>id</code> string</td><td>Element or <code>null</code></td><td><code>document.getElementById("header")</code></td></tr>
+            <tr><td><code>document.getElementsByClassName</code></td><td><code>class</code> string</td><td><code>HTMLCollection</code></td><td><code>document.getElementsByClassName("list")[0]</code></td></tr>
+            <tr><td><code>document.getElementsByTagName</code></td><td><code>tag</code> string</td><td><code>HTMLCollection</code></td><td><code>document.getElementsByTagName("ul")[2]</code></td></tr>
+            <tr><td><code>document.head</code></td><td>—</td><td><code>&lt;head&gt;</code> element</td><td><code>document.head</code></td></tr>
+            <tr><td><code>document.title</code></td><td>—</td><td>string</td><td><code>document.title</code></td></tr>
+            <tr><td><code>document.body</code></td><td>—</td><td><code>&lt;body&gt;</code> element</td><td><code>document.body</code></td></tr>
+            <tr><td><code>document.links</code></td><td>—</td><td>collection of <code>&lt;a href&gt;</code></td><td><code>document.links[0]</code></td></tr>
+            <tr><td><code>document.images</code></td><td>—</td><td>collection of <code>&lt;img&gt;</code></td><td><code>document.images.length</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="conclusion" class="card">
+        <h2>Conclusion</h2>
+        <ul>
+          <li>Choose <b>id</b> for a unique element, <b>class/tag</b> for groups.</li>
+          <li>Collections are array‑like; index into them or convert to arrays to iterate.</li>
+          <li><b>document</b> exposes convenient shortcuts to global parts of the page.</li>
+        </ul>
+
+        <h3>Interactive Quiz</h3>
+        <div class="quiz" id="quiz">
+          <!-- Q1 MCQ -->
+          <div class="q">
+            <div><b>1) Which method returns a single element or null?</b></div>
+            <label class="choice"><input type="radio" name="q1"> document.getElementsByClassName("box")</label>
+            <label class="choice"><input type="radio" name="q1"> document.getElementsByTagName("p")</label>
+            <label class="choice"><input type="radio" name="q1"> document.getElementById("header")</label>
+            <label class="choice"><input type="radio" name="q1"> document.links</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">document.getElementById("header").</div></details>
+          </div>
+
+          <!-- Q2 MCQ -->
+          <div class="q">
+            <div><b>2) What type is returned by getElementsByClassName?</b></div>
+            <label class="choice"><input type="radio" name="q2"> A real JavaScript Array</label>
+            <label class="choice"><input type="radio" name="q2"> A string</label>
+            <label class="choice"><input type="radio" name="q2"> An HTMLCollection</label>
+            <label class="choice"><input type="radio" name="q2"> A Map</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">An HTMLCollection.</div></details>
+          </div>
+
+          <!-- Q3 SA -->
+          <div class="q">
+            <div><b>3) Short answer:</b> How do you access the third <code>&lt;ul&gt;</code> returned by <code>getElementsByTagName("ul")</code>?</div>
+            <button data-target="a3">Reveal answer</button>
+            <div id="a3" class="ans">document.getElementsByTagName("ul")[2]</div>
+          </div>
+
+          <!-- Q4 MCQ -->
+          <div class="q">
+            <div><b>4) Which property returns the text inside the page’s title?</b></div>
+            <label class="choice"><input type="radio" name="q4"> document.head</label>
+            <label class="choice"><input type="radio" name="q4"> document.title</label>
+            <label class="choice"><input type="radio" name="q4"> document.body</label>
+            <label class="choice"><input type="radio" name="q4"> document.URL</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">document.title.</div></details>
+          </div>
+
+          <!-- Q5 SA -->
+          <div class="q">
+            <div><b>5) Short answer:</b> Write the command to target the element with id <code>header</code>.</div>
+            <button data-target="a5">Reveal answer</button>
+            <div id="a5" class="ans">document.getElementById("header")</div>
+          </div>
+
+          <!-- Q6 MCQ -->
+          <div class="q">
+            <div><b>6) Which option correctly describes <code>document.links</code>?</b></div>
+            <label class="choice"><input type="radio" name="q6"> A single element</label>
+            <label class="choice"><input type="radio" name="q6"> A collection of anchor elements with an href</label>
+            <label class="choice"><input type="radio" name="q6"> The page URL as a string</label>
+            <label class="choice"><input type="radio" name="q6"> The first link only</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">A collection of anchor elements with an href.</div></details>
+          </div>
+
+          <!-- Q7 SA -->
+          <div class="q">
+            <div><b>7) Short answer:</b> How do you loop all images and log their <code>src</code> values?</div>
+            <button data-target="a7">Reveal answer</button>
+            <div id="a7" class="ans">Array.from(document.images).forEach(img =&gt; console.log(img.src))</div>
+          </div>
+
+          <!-- Q8 MCQ -->
+          <div class="q">
+            <div><b>8) Which argument type do the id/class/tag methods expect?</b></div>
+            <label class="choice"><input type="radio" name="q8"> A number</label>
+            <label class="choice"><input type="radio" name="q8"> A string</label>
+            <label class="choice"><input type="radio" name="q8"> A boolean</label>
+            <label class="choice"><input type="radio" name="q8"> An object</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">A string.</div></details>
+          </div>
+
+          <!-- Q9 SA -->
+          <div class="q">
+            <div><b>9) Short answer:</b> Which property gives you the entire <code>&lt;html&gt;</code> element?</div>
+            <button data-target="a9">Reveal answer</button>
+            <div id="a9" class="ans">document.documentElement</div>
+          </div>
+
+          <!-- Q10 MCQ -->
+          <div class="q">
+            <div><b>10) Which statement is true about class/tag selections?</b></div>
+            <label class="choice"><input type="radio" name="q10"> They return a single element</label>
+            <label class="choice"><input type="radio" name="q10"> They return an HTMLCollection</label>
+            <label class="choice"><input type="radio" name="q10"> They return a string</label>
+            <label class="choice"><input type="radio" name="q10"> They return the page URL</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">They return an HTMLCollection.</div></details>
+          </div>
+
+          <!-- Q11 SA -->
+          <div class="q">
+            <div><b>11) Short answer:</b> How do you get the first element with class <code>list</code>?</div>
+            <button data-target="a11">Reveal answer</button>
+            <div id="a11" class="ans">document.getElementsByClassName("list")[0]</div>
+          </div>
+
+          <!-- Q12 MCQ -->
+          <div class="q">
+            <div><b>12) Which property returns the current document’s full URL?</b></div>
+            <label class="choice"><input type="radio" name="q12"> document.URL</label>
+            <label class="choice"><input type="radio" name="q12"> document.title</label>
+            <label class="choice"><input type="radio" name="q12"> document.forms</label>
+            <label class="choice"><input type="radio" name="q12"> document.body</label>
+            <details class="reveal"><summary>Show answer</summary><div class="details-body">document.URL.</div></details>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer-note">Optimized for quick revision. 🚀</div>
+    </main>
+  </div>
+
+  <script>
+    // Short-answer reveal buttons
+    (function () {
+      document.querySelectorAll('.quiz button[data-target]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var id = btn.getAttribute('data-target');
+          var ans = document.getElementById(id);
+          if (!ans) return;
+          var visible = ans.style.display === 'block';
+          ans.style.display = visible ? 'none' : 'block';
+          btn.textContent = visible ? 'Reveal answer' : 'Hide answer';
+        });
+      });
+    })();
+
+    // Diagram interactivity
+    (function () {
+      var diagram = document.getElementById('dom-diagram');
+      if (!diagram) return;
+      var cmd = document.getElementById('diagram-cmd');
+      function clearHL() {
+        diagram.querySelectorAll('.node.hl').forEach(function(n){ n.classList.remove('hl'); });
+      }
+      function setCmd(text) {
+        if (cmd) cmd.textContent = 'Command: ' + text;
+      }
+      diagram.querySelectorAll('.diagram-controls button').forEach(function(b){
+        b.addEventListener('click', function(){
+          var kind = b.getAttribute('data-demo');
+          clearHL();
+          if (kind === 'byId') {
+            var n = diagram.querySelector('[data-id="header"]');
+            if (n) n.classList.add('hl');
+            setCmd('document.getElementById("header")');
+          } else if (kind === 'byClass') {
+            diagram.querySelectorAll('[data-class="list"]').forEach(function(n){ n.classList.add('hl'); });
+            setCmd('document.getElementsByClassName("list")');
+          } else if (kind === 'byTagUl') {
+            ['ul1'].forEach(function(key){
+              var n = diagram.querySelector('[data-key="'+key+'"]');
+              if (n) n.classList.add('hl');
+            });
+            setCmd('document.getElementsByTagName("ul")');
+          } else {
+            setCmd('—');
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
