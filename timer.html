@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ultra Timer — Countdown & Stopwatch</title>
+  <style>
+    /* Heavy display font for big digits */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@800;900&display=swap');
+    :root{
+      --bg:#111313;
+      --fg:#ffffff;
+      --muted:#9aa0a6;
+      --accent:#22d3ee;
+      --danger:#ff4d4f;
+      --ok:#4ade80;
+      --panel:#161819;
+      --border:#2a2e33;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:#0f1011;
+      color:var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Arial;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .wrapper{
+      min-height:100%;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      padding:16px;
+    }
+    .screen{
+      flex:1 1 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#121314;
+      border:1px solid var(--border);
+      border-radius:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .digits{
+      font-family: 'Inter', 'Arial Black', Impact, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-weight:900;
+      letter-spacing:0; /* tighter look like a scoreboard */
+      font-variant-numeric: tabular-nums; /* fixed width digits */
+      color:#fff;
+      text-shadow: 0 2px 8px rgba(0,0,0,.5);
+      user-select:none;
+      line-height:0.95;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:.08em;
+      /* Auto-scale for all screens */
+      font-size: clamp(56px, 18vw, 240px);
+    }
+    .sep{ opacity:.9; }
+    .blink{ opacity:.25; transition:opacity .25s linear; }
+
+    /* Progress bar at the bottom of the screen */
+    .progress{
+      position:absolute; left:0; right:0; bottom:0; height:6px;
+      background:#1b1f23;
+    }
+    .bar{ height:100%; width:0%; background:linear-gradient(90deg,#22d3ee,#a78bfa); transition:width .25s linear; }
+
+    .controls{
+      display:grid;
+      gap:10px;
+      grid-template-columns: repeat(12, 1fr);
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+    }
+    .controls .group{ display:contents; }
+    .mode-toggle{ grid-column: span 12; display:flex; gap:8px; align-items:center; justify-content:center; }
+    .btn{
+      background:#181a1c; color:#fff; border:1px solid var(--border);
+      border-radius:10px; padding:10px 12px; cursor:pointer; text-align:center;
+      user-select:none; font-weight:600; letter-spacing:.2px;
+    }
+    .btn:hover{ border-color:#3a3f45; }
+    .btn.primary{ background:#0f1418; border-color:#2b98a3; box-shadow: inset 0 0 0 1px rgba(34,211,238,.25); }
+    .btn.success{ border-color:#2e7d32; }
+    .btn.danger{ border-color:#a72a2a; color:#ffd5d5; }
+    .btn.block{ grid-column: span 12; }
+    .btn.sm{ padding:8px 10px; font-weight:600; }
+
+    .inputs{ grid-column: span 12; display:grid; grid-template-columns: repeat(6, 1fr); gap:8px; }
+    .inputs .field{ grid-column: span 2; }
+    .label{ color:var(--muted); font-size:12px; margin-bottom:4px; }
+    input[type=number]{ width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:#101214; color:#fff; font-size:16px; text-align:center; }
+
+    .actions{ grid-column: span 12; display:grid; grid-template-columns: repeat(12, 1fr); gap:8px; align-items:center; }
+    .actions .btn{ grid-column: span 4; }
+    .actions .btn.big{ grid-column: span 6; padding:14px 12px; font-size:16px; }
+
+    .quick{ grid-column: span 12; display:flex; gap:8px; flex-wrap:wrap; }
+    .quick .btn{ padding:8px 10px; }
+
+    .row{ grid-column: span 12; display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    .left, .right{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+    .lap-wrap{ grid-column: span 12; }
+    .laps{ list-style:none; padding:0; margin:0; max-height:180px; overflow:auto; border:1px dashed var(--border); border-radius:12px; }
+    .laps li{ display:flex; justify-content:space-between; padding:8px 10px; border-bottom:1px dashed var(--border); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .laps li:last-child{ border-bottom:none; }
+    .hint{ color:var(--muted); font-size:12px; }
+
+    .ring{ position:absolute; inset:0; pointer-events:none; box-shadow: inset 0 0 0 0 rgba(255,255,255,.06); transition: box-shadow .2s ease; }
+    .screen.alert .ring{ box-shadow: inset 0 0 0 120vmax rgba(255, 77, 77, 0.08); }
+
+    /* Fullscreen: show only the clock */
+    .screen:fullscreen { border-radius:0; border:none; background:#0f1011; }
+    .screen:fullscreen .progress, .screen:fullscreen .ring { display:none; }
+    .screen:fullscreen .digits { font-size: clamp(72px, 22vw, 260px); }
+    /* Safari/WebKit */
+    .screen:-webkit-full-screen { border-radius:0; border:none; background:#0f1011; }
+    .screen:-webkit-full-screen .progress, .screen:-webkit-full-screen .ring { display:none; }
+    .screen:-webkit-full-screen .digits { font-size: clamp(72px, 22vw, 260px); }
+
+    /* Responsive adjustments */
+    @media (min-width: 720px){
+      .controls{ grid-template-columns: repeat(12, 1fr); }
+      .inputs{ grid-template-columns: repeat(12, 1fr); }
+      .inputs .field{ grid-column: span 4; }
+      .actions .btn{ grid-column: span 3; }
+      .actions .btn.big{ grid-column: span 4; }
+    }
+
+    @media (max-width: 420px){
+      .actions .btn{ grid-column: span 6; }
+      .actions .btn.big{ grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="screen" id="screen">
+      <div class="digits" aria-live="polite" aria-atomic="true">
+        <span id="h">00</span><span class="sep" id="c1">:</span><span id="m">00</span><span class="sep" id="c2">:</span><span id="s">00</span>
+      </div>
+      <div class="ring"></div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+    </div>
+
+    <div class="controls" role="group" aria-label="Timer controls">
+      <div class="mode-toggle">
+        <button class="btn sm" id="modeCountdown" title="Countdown mode">Countdown</button>
+        <button class="btn sm" id="modeStopwatch" title="Stopwatch mode">Stopwatch</button>
+        <span class="hint">Tap a mode to switch. Space = start/pause, R = reset, F = fullscreen, L = lap.</span>
+      </div>
+
+      <div class="inputs" id="inputs">
+        <div class="field"><div class="label">Hours</div><input id="inH" type="number" min="0" max="99" step="1" value="0" inputmode="numeric" /></div>
+        <div class="field"><div class="label">Minutes</div><input id="inM" type="number" min="0" max="59" step="1" value="5" inputmode="numeric" /></div>
+        <div class="field"><div class="label">Seconds</div><input id="inS" type="number" min="0" max="59" step="1" value="0" inputmode="numeric" /></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn big primary" id="start">Start</button>
+        <button class="btn big" id="pause">Pause</button>
+        <button class="btn big danger" id="reset">Reset</button>
+      </div>
+
+      <div class="quick">
+        <span class="hint">Quick add/subtract:</span>
+        <button class="btn sm" data-add="-60">-1m</button>
+        <button class="btn sm" data-add="60">+1m</button>
+        <button class="btn sm" data-add="300">+5m</button>
+        <button class="btn sm" data-add="600">+10m</button>
+        <button class="btn sm" data-preset="300">Preset 05:00</button>
+        <button class="btn sm" data-preset="1800">Preset 30:00</button>
+        <button class="btn sm" id="sound">Sound: On</button>
+        <button class="btn sm" id="fullscreen">Fullscreen</button>
+      </div>
+
+      <div class="row">
+        <div class="left">
+          <span class="hint">Mode:</span>
+          <span id="modeLabel">Countdown</span>
+        </div>
+        <div class="right">
+          <button class="btn sm" id="lap">Lap</button>
+          <button class="btn sm" id="clearLaps">Clear Laps</button>
+        </div>
+      </div>
+
+      <div class="lap-wrap">
+        <ul class="laps" id="laps" aria-label="Lap times"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const el = (id)=>document.getElementById(id);
+      const hEl = el('h'), mEl = el('m'), sEl = el('s');
+      const c1 = el('c1'), c2 = el('c2');
+      const bar = el('bar');
+      const screen = el('screen');
+
+      const startBtn = el('start');
+      const pauseBtn = el('pause');
+      const resetBtn = el('reset');
+      const modeCountdownBtn = el('modeCountdown');
+      const modeStopwatchBtn = el('modeStopwatch');
+      const soundBtn = el('sound');
+      const fsBtn = el('fullscreen');
+      const modeLabel = el('modeLabel');
+      const lapBtn = el('lap');
+      const clearLapsBtn = el('clearLaps');
+      const lapsEl = el('laps');
+
+      const inH = el('inH'), inM = el('inM'), inS = el('inS');
+
+      const QUICK = document.querySelectorAll('[data-add]');
+      const PRESETS = document.querySelectorAll('[data-preset]');
+
+      let mode = 'countdown'; // 'countdown' | 'stopwatch'
+      let running = false;
+      let lastTick = 0;
+      let rafId = 0;
+
+      // Countdown state
+      let countdownTotalMs = 5*60*1000; // default 5 min
+      let countdownRemainingMs = countdownTotalMs;
+      let countdownStartedAt = 0;
+
+      // Stopwatch state
+      let swElapsedMs = 0;
+      let swStartedAt = 0;
+
+      // Sound
+      let soundOn = true;
+
+      // Utilities
+      function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+      function pad(n){ return n.toString().padStart(2, '0'); }
+      function format(ms){
+        const totalSeconds = Math.floor(ms/1000);
+        const s = totalSeconds % 60;
+        const m = Math.floor(totalSeconds/60) % 60;
+        const h = Math.floor(totalSeconds/3600);
+        return {h, m, s};
+      }
+      function render(ms, blinkColons){
+        const {h, m, s} = format(Math.max(0, ms));
+        hEl.textContent = pad(h);
+        mEl.textContent = pad(m);
+        sEl.textContent = pad(s);
+        const on = !(blinkColons && (Math.floor(ms/1000)%2===0));
+        c1.classList.toggle('blink', !on);
+        c2.classList.toggle('blink', !on);
+      }
+      function updateProgress(){
+        if(mode==='countdown'){
+          const pct = countdownTotalMs>0? (100* (1 - countdownRemainingMs / countdownTotalMs)) : 0;
+          bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
+        } else {
+          bar.style.width = '0%';
+        }
+      }
+
+      // WebAudio beep
+      function beep(pattern=[300,200,300]){ // ms on/off alternating, starting with on
+        if(!soundOn) return;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if(!AC){ return; }
+        const ctx = new AC();
+        let t = ctx.currentTime;
+        const gain = ctx.createGain();
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.0001, t);
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, t);
+        osc.connect(gain);
+        osc.start();
+        // play pattern
+        let on = true; let msLeft = pattern.slice();
+        for(let i=0;i<msLeft.length;i++){
+          const dur = msLeft[i] / 1000;
+          if(on){
+            gain.gain.setTargetAtTime(0.2, t, 0.01);
+          }else{
+            gain.gain.setTargetAtTime(0.0001, t, 0.01);
+          }
+          t += dur;
+          on = !on;
+        }
+        osc.stop(t+0.05);
+        osc.onended = ()=> ctx.close();
+      }
+
+      // Fullscreen
+      function toggleFullscreen(){
+        const target = screen; // fullscreen only the clock area
+        if(!document.fullscreenElement){
+          const req = target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen || target.mozRequestFullScreen;
+          req && req.call(target);
+        } else {
+          document.exitFullscreen && document.exitFullscreen();
+        }
+      }
+
+      // Mode switching
+      function setMode(newMode){
+        if(mode===newMode) return;
+        pause();
+        mode = newMode;
+        modeLabel.textContent = mode==='countdown' ? 'Countdown' : 'Stopwatch';
+        document.body.dataset.mode = mode;
+        el('inputs').style.display = mode==='countdown'? 'grid' : 'none';
+        bar.style.visibility = mode==='countdown'? 'visible' : 'hidden';
+        screen.classList.remove('alert');
+        if(mode==='stopwatch') render(swElapsedMs, false); else render(countdownRemainingMs, true);
+      }
+
+      // Countdown helpers
+      function inputsToMs(){
+        const H = clamp(parseInt(inH.value||'0',10), 0, 99);
+        const M = clamp(parseInt(inM.value||'0',10), 0, 59);
+        const S = clamp(parseInt(inS.value||'0',10), 0, 59);
+        return ((H*60 + M)*60 + S) * 1000;
+      }
+      function applyInputs(){
+        countdownTotalMs = inputsToMs();
+        countdownRemainingMs = countdownTotalMs;
+        render(countdownRemainingMs, true);
+        updateProgress();
+      }
+      function addSeconds(sec){
+        countdownRemainingMs = clamp(countdownRemainingMs + sec*1000, 0, 99*3600*1000);
+        countdownTotalMs = Math.max(countdownTotalMs, countdownRemainingMs);
+        const {h,m,s} = format(countdownRemainingMs);
+        inH.value = h; inM.value = m; inS.value = s;
+        render(countdownRemainingMs, true); updateProgress();
+      }
+
+      // Engine
+      function start(){
+        if(mode==='countdown'){
+          // If not set, read from inputs
+          if(!running){ countdownRemainingMs = inputsToMs(); countdownTotalMs = countdownRemainingMs; }
+          if(countdownRemainingMs<=0){ return; }
+          countdownStartedAt = performance.now();
+        } else {
+          swStartedAt = performance.now();
+        }
+        running = true;
+        screen.classList.remove('alert');
+        lastTick = performance.now();
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(tick);
+      }
+      function pause(){
+        if(!running) return;
+        running = false;
+        cancelAnimationFrame(rafId);
+        const now = performance.now();
+        if(mode==='countdown'){
+          countdownRemainingMs = Math.max(0, countdownRemainingMs - (now - countdownStartedAt));
+        } else {
+          swElapsedMs += now - swStartedAt;
+        }
+        render(mode==='countdown'? countdownRemainingMs : swElapsedMs, true);
+        updateProgress();
+      }
+      function reset(){
+        running = false; cancelAnimationFrame(rafId);
+        if(mode==='countdown'){
+          countdownRemainingMs = countdownTotalMs = inputsToMs();
+          render(countdownRemainingMs, false);
+        } else {
+          swElapsedMs = 0; render(0, false); lapsEl.innerHTML='';
+        }
+        updateProgress();
+        screen.classList.remove('alert');
+      }
+      function finished(){
+        running = false; cancelAnimationFrame(rafId);
+        render(0, false); updateProgress();
+        screen.classList.add('alert');
+        beep([400,200,400,200,800]);
+        // mobile vibration if available
+        if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+      }
+      function tick(ts){
+        if(!running){ return; }
+        const dt = ts - lastTick; lastTick = ts;
+        if(mode==='countdown'){
+          const elapsed = ts - countdownStartedAt;
+          const remain = countdownRemainingMs - elapsed;
+          if(remain <= 0){ render(0, false); updateProgress(); finished(); return; }
+          render(remain, true);
+          const pct = countdownTotalMs>0? (1 - remain/countdownTotalMs) : 0; bar.style.width = (pct*100).toFixed(2)+'%';
+        } else {
+          const elapsed = swElapsedMs + (ts - swStartedAt);
+          render(elapsed, true);
+        }
+        rafId = requestAnimationFrame(tick);
+      }
+
+      // Laps (stopwatch)
+      function addLap(){
+        if(mode!=='stopwatch') return;
+        const nowMs = running ? (swElapsedMs + (performance.now() - swStartedAt)) : swElapsedMs;
+        const {h,m,s} = format(nowMs);
+        const li = document.createElement('li');
+        li.innerHTML = `<span>Lap</span><span>${pad(h)}:${pad(m)}:${pad(s)}</span>`;
+        lapsEl.prepend(li);
+      }
+
+      // Wire up
+      startBtn.addEventListener('click', start);
+      pauseBtn.addEventListener('click', pause);
+      resetBtn.addEventListener('click', reset);
+      soundBtn.addEventListener('click', ()=>{ soundOn=!soundOn; soundBtn.textContent = 'Sound: ' + (soundOn?'On':'Off'); });
+      fsBtn.addEventListener('click', toggleFullscreen);
+      modeCountdownBtn.addEventListener('click', ()=> setMode('countdown'));
+      modeStopwatchBtn.addEventListener('click', ()=> setMode('stopwatch'));
+      lapBtn.addEventListener('click', addLap);
+      clearLapsBtn.addEventListener('click', ()=> lapsEl.innerHTML='');
+
+      [inH,inM,inS].forEach(i=> i.addEventListener('change', applyInputs));
+      QUICK.forEach(btn=> btn.addEventListener('click', ()=> addSeconds(parseInt(btn.dataset.add,10))));
+      PRESETS.forEach(btn=> btn.addEventListener('click', ()=>{ countdownTotalMs = countdownRemainingMs = parseInt(btn.dataset.preset,10)*1000; const {h,m,s}=format(countdownRemainingMs); inH.value=h; inM.value=m; inS.value=s; render(countdownRemainingMs,true); updateProgress(); }));
+
+      // Keyboard shortcuts
+      window.addEventListener('keydown', (e)=>{
+        if(e.target && ['INPUT','TEXTAREA'].includes(e.target.tagName)) return; // allow typing in inputs
+        if(e.code==='Space'){ e.preventDefault(); running? pause(): start(); }
+        else if(e.key==='r' || e.key==='R'){ reset(); }
+        else if(e.key==='f' || e.key==='F'){ toggleFullscreen(); }
+        else if(e.key==='m' || e.key==='M'){ setMode(mode==='countdown'?'stopwatch':'countdown'); }
+        else if(e.key==='l' || e.key==='L'){ addLap(); }
+      });
+
+      // Initialize
+      applyInputs();
+      setMode('countdown');
+    })();
+  </script>
+  
+</body>
+</html>
+
+
